@@ -6,6 +6,7 @@ import ragRouter from './rag';
 import taskExtractorRouter from './taskExtractor';
 import agentsRouter from './agents';
 import actionsRouter from './actions';
+import privacyRouter from './privacy';
 
 const router = Router();
 
@@ -17,6 +18,7 @@ router.use('/v1/rag', ragRouter);
 router.use('/v1/tasks', taskExtractorRouter);
 router.use('/v1/agents', agentsRouter);
 router.use('/actions', actionsRouter);
+router.use('/v1/privacy', privacyRouter);
 
 // API info
 router.get('/', (req, res) => {
@@ -31,6 +33,7 @@ router.get('/', (req, res) => {
       tasks: '/api/v1/tasks',
       agents: '/api/v1/agents',
       actions: '/api/actions',
+      privacy: '/api/v1/privacy',
     },
   });
 });
