@@ -36,7 +36,7 @@ export default function LoginButton() {
 
   return (
     <Button
-      variant="default"
+      variant="primary"
       size="sm"
       onClick={() => (window.location.href = '/api/auth/login')}
     >
