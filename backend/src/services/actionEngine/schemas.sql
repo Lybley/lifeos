@@ -7,14 +7,12 @@
 CREATE TABLE IF NOT EXISTS actions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id VARCHAR(255) NOT NULL,
-  action_type VARCHAR(50) NOT NULL, -- create_calendar_event, send_email, move_file, create_document
-  status VARCHAR(20) DEFAULT 'pending', -- pending, approved, rejected, executing, completed, failed, rolled_back
-  priority INTEGER DEFAULT 5, -- 1 (highest) to 10 (lowest)
+  action_type VARCHAR(50) NOT NULL,
+  status VARCHAR(20) DEFAULT 'pending',
+  priority INTEGER DEFAULT 5,
   
-  -- Action payload
   payload JSONB NOT NULL,
   
-  -- Approval workflow
   requires_approval BOOLEAN DEFAULT true,
   approval_token VARCHAR(255) UNIQUE,
   approval_expires_at TIMESTAMP,
@@ -22,7 +20,6 @@ CREATE TABLE IF NOT EXISTS actions (
   approved_at TIMESTAMP,
   rejection_reason TEXT,
   
-  -- Execution metadata
   scheduled_for TIMESTAMP,
   started_at TIMESTAMP,
   completed_at TIMESTAMP,
@@ -30,27 +27,23 @@ CREATE TABLE IF NOT EXISTS actions (
   retry_count INTEGER DEFAULT 0,
   max_retries INTEGER DEFAULT 3,
   
-  -- Rollback metadata
-  rollback_data JSONB, -- Data needed to undo the action
+  rollback_data JSONB,
   rolled_back_at TIMESTAMP,
   rollback_reason TEXT,
   
-  -- Rate limiting
-  rate_limit_key VARCHAR(255), -- e.g., 'send_email:user_123'
+  rate_limit_key VARCHAR(255),
   
-  -- Audit
   created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW(),
-  
-  -- Indexes
-  INDEX idx_actions_user_id (user_id),
-  INDEX idx_actions_status (status),
-  INDEX idx_actions_action_type (action_type),
-  INDEX idx_actions_approval_token (approval_token),
-  INDEX idx_actions_scheduled_for (scheduled_for),
-  INDEX idx_actions_created_at (created_at),
-  INDEX idx_actions_rate_limit_key (rate_limit_key)
+  updated_at TIMESTAMP DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS idx_actions_user_id ON actions(user_id);
+CREATE INDEX IF NOT EXISTS idx_actions_status ON actions(status);
+CREATE INDEX IF NOT EXISTS idx_actions_action_type ON actions(action_type);
+CREATE INDEX IF NOT EXISTS idx_actions_approval_token ON actions(approval_token);
+CREATE INDEX IF NOT EXISTS idx_actions_scheduled_for ON actions(scheduled_for);
+CREATE INDEX IF NOT EXISTS idx_actions_created_at ON actions(created_at);
+CREATE INDEX IF NOT EXISTS idx_actions_rate_limit_key ON actions(rate_limit_key);
 
 -- ============================================================================
 -- ACTION AUDIT LOGS
@@ -61,24 +54,20 @@ CREATE TABLE IF NOT EXISTS action_audit_logs (
   action_id UUID NOT NULL REFERENCES actions(id) ON DELETE CASCADE,
   user_id VARCHAR(255) NOT NULL,
   
-  -- Event details
-  event_type VARCHAR(50) NOT NULL, -- created, approved, rejected, started, completed, failed, rolled_back
+  event_type VARCHAR(50) NOT NULL,
   event_data JSONB,
   
-  -- Context
   ip_address VARCHAR(45),
   user_agent TEXT,
-  source VARCHAR(50), -- api, webhook, email_link, ui
+  source VARCHAR(50),
   
-  -- Metadata
-  created_at TIMESTAMP DEFAULT NOW(),
-  
-  -- Indexes
-  INDEX idx_audit_action_id (action_id),
-  INDEX idx_audit_user_id (user_id),
-  INDEX idx_audit_event_type (event_type),
-  INDEX idx_audit_created_at (created_at)
+  created_at TIMESTAMP DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS idx_audit_action_id ON action_audit_logs(action_id);
+CREATE INDEX IF NOT EXISTS idx_audit_user_id ON action_audit_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_event_type ON action_audit_logs(event_type);
+CREATE INDEX IF NOT EXISTS idx_audit_created_at ON action_audit_logs(created_at);
 
 -- ============================================================================
 -- RATE LIMITS
@@ -86,7 +75,7 @@ CREATE TABLE IF NOT EXISTS action_audit_logs (
 
 CREATE TABLE IF NOT EXISTS action_rate_limits (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  rate_limit_key VARCHAR(255) NOT NULL, -- e.g., 'send_email:user_123:daily'
+  rate_limit_key VARCHAR(255) NOT NULL,
   count INTEGER DEFAULT 0,
   window_start TIMESTAMP DEFAULT NOW(),
   window_duration INTERVAL DEFAULT '1 day',
@@ -95,10 +84,11 @@ CREATE TABLE IF NOT EXISTS action_rate_limits (
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
   
-  UNIQUE (rate_limit_key, window_start),
-  INDEX idx_rate_limits_key (rate_limit_key),
-  INDEX idx_rate_limits_window (window_start)
+  UNIQUE (rate_limit_key, window_start)
 );
+
+CREATE INDEX IF NOT EXISTS idx_rate_limits_key ON action_rate_limits(rate_limit_key);
+CREATE INDEX IF NOT EXISTS idx_rate_limits_window ON action_rate_limits(window_start);
 
 -- ============================================================================
 -- SAFETY RULES
@@ -108,17 +98,18 @@ CREATE TABLE IF NOT EXISTS action_safety_rules (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   action_type VARCHAR(50) NOT NULL,
   rule_name VARCHAR(100) NOT NULL,
-  rule_type VARCHAR(50) NOT NULL, -- blocked, requires_approval, requires_kyc, rate_limit
+  rule_type VARCHAR(50) NOT NULL,
   rule_config JSONB NOT NULL,
   enabled BOOLEAN DEFAULT true,
   
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
   
-  UNIQUE (action_type, rule_name),
-  INDEX idx_safety_rules_type (action_type),
-  INDEX idx_safety_rules_enabled (enabled)
+  UNIQUE (action_type, rule_name)
 );
+
+CREATE INDEX IF NOT EXISTS idx_safety_rules_type ON action_safety_rules(action_type);
+CREATE INDEX IF NOT EXISTS idx_safety_rules_enabled ON action_safety_rules(enabled);
 
 -- ============================================================================
 -- ROLLBACK HISTORY
@@ -133,11 +124,11 @@ CREATE TABLE IF NOT EXISTS action_rollback_history (
   success BOOLEAN,
   error_message TEXT,
   
-  created_at TIMESTAMP DEFAULT NOW(),
-  
-  INDEX idx_rollback_action_id (action_id),
-  INDEX idx_rollback_created_at (created_at)
+  created_at TIMESTAMP DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS idx_rollback_action_id ON action_rollback_history(action_id);
+CREATE INDEX IF NOT EXISTS idx_rollback_created_at ON action_rollback_history(created_at);
 
 -- ============================================================================
 -- DEFAULT SAFETY RULES
