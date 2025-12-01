@@ -49,34 +49,30 @@ app.use(errorHandler);
 
 // Database initialization
 const initializeDatabases = async () => {
+  // Test PostgreSQL connection (optional)
   try {
-    // Test PostgreSQL connection
     await postgresClient.query('SELECT NOW()');
     logger.info('PostgreSQL connected successfully');
+  } catch (pgError) {
+    logger.warn('PostgreSQL not available, some features will be limited:', pgError);
+  }
 
-    // Test Neo4j connection (optional)
-    try {
-      const session = neo4jDriver.session();
-      await session.run('RETURN 1');
-      await session.close();
-      logger.info('Neo4j connected successfully');
-    } catch (error) {
-      logger.warn('Neo4j connection failed, continuing without Neo4j:', error);
-    }
+  // Test Neo4j connection (optional)
+  try {
+    const neo4jSession = neo4jDriver.session();
+    await neo4jSession.run('RETURN 1 AS test');
+    await neo4jSession.close();
+    logger.info('Neo4j connected successfully');
+  } catch (neoError) {
+    logger.warn('Neo4j not available, graph features will be limited');
+  }
 
-    // Test Pinecone connection (if API key is provided)
-    if (process.env.PINECONE_API_KEY) {
-      // Pinecone client will be initialized in the config
-      logger.info('Pinecone client initialized');
-    }
-
-    // Test Redis connection
+  // Test Redis connection (optional for WebSocket)
+  try {
     await queueConnection.ping();
     logger.info('Redis connected successfully');
-
-  } catch (error) {
-    logger.error('Database initialization failed:', error);
-    throw error;
+  } catch (redisError) {
+    logger.warn('Redis not available, background jobs will be limited');
   }
 };
 
