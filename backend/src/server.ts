@@ -51,11 +51,15 @@ const initializeDatabases = async () => {
     await postgresClient.query('SELECT NOW()');
     logger.info('PostgreSQL connected successfully');
 
-    // Test Neo4j connection
-    const session = neo4jDriver.session();
-    await session.run('RETURN 1');
-    await session.close();
-    logger.info('Neo4j connected successfully');
+    // Test Neo4j connection (optional)
+    try {
+      const session = neo4jDriver.session();
+      await session.run('RETURN 1');
+      await session.close();
+      logger.info('Neo4j connected successfully');
+    } catch (error) {
+      logger.warn('Neo4j connection failed, continuing without Neo4j:', error);
+    }
 
     // Test Pinecone connection (if API key is provided)
     if (process.env.PINECONE_API_KEY) {
