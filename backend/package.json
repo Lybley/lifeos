@@ -1,0 +1,50 @@
+{
+  "name": "lifeos-backend",
+  "version": "1.0.0",
+  "description": "LifeOS Core Backend API",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix"
+  },
+  "keywords": ["lifeos", "api", "express", "typescript"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "dotenv": "^16.3.1",
+    "express-validator": "^7.0.1",
+    "express-async-errors": "^3.1.1",
+    "pg": "^8.11.3",
+    "neo4j-driver": "^5.14.0",
+    "@pinecone-database/pinecone": "^1.1.2",
+    "bullmq": "^4.15.0",
+    "ioredis": "^5.3.2",
+    "express-oauth2-jwt-bearer": "^1.6.0",
+    "winston": "^3.11.0",
+    "morgan": "^1.10.0",
+    "compression": "^1.7.4"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "@types/node": "^20.10.4",
+    "@types/compression": "^1.7.5",
+    "@types/morgan": "^1.9.9",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
+    "eslint": "^8.55.0",
+    "typescript": "^5.3.3",
+    "ts-node-dev": "^2.0.0",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.11",
+    "ts-jest": "^29.1.1"
+  }
+}
