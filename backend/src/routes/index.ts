@@ -4,6 +4,7 @@ import vectorsRouter from './vectors';
 import jobsRouter from './jobs';
 import ragRouter from './rag';
 import taskExtractorRouter from './taskExtractor';
+import agentsRouter from './agents';
 
 const router = Router();
 
@@ -13,6 +14,7 @@ router.use('/vectors', vectorsRouter);
 router.use('/jobs', jobsRouter);
 router.use('/v1/rag', ragRouter);
 router.use('/v1/tasks', taskExtractorRouter);
+router.use('/v1/agents', agentsRouter);
 
 // API info
 router.get('/', (req, res) => {
@@ -25,6 +27,7 @@ router.get('/', (req, res) => {
       jobs: '/api/jobs',
       rag: '/api/v1/rag',
       tasks: '/api/v1/tasks',
+      agents: '/api/v1/agents',
     },
   });
 });
