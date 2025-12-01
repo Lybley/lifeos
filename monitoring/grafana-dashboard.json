@@ -1,0 +1,441 @@
+{
+  "dashboard": {
+    "title": "LifeOS - Main Dashboard",
+    "tags": ["lifeos", "monitoring"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 1,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "System Health Overview",
+        "type": "row",
+        "gridPos": { "x": 0, "y": 0, "w": 24, "h": 1 }
+      },
+      {
+        "id": 2,
+        "title": "HTTP Request Rate",
+        "type": "graph",
+        "gridPos": { "x": 0, "y": 1, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "rate(lifeos_http_requests_total[5m])",
+            "legendFormat": "{{method}} {{route}} - {{status_code}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Requests/sec",
+            "format": "short"
+          }
+        ],
+        "xaxis": {
+          "mode": "time"
+        }
+      },
+      {
+        "id": 3,
+        "title": "HTTP Request Duration (P95)",
+        "type": "graph",
+        "gridPos": { "x": 12, "y": 1, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(lifeos_http_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "P95 - {{route}}",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.50, rate(lifeos_http_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "P50 - {{route}}",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Duration (seconds)",
+            "format": "s"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "KPI Metrics",
+        "type": "row",
+        "gridPos": { "x": 0, "y": 9, "w": 24, "h": 1 }
+      },
+      {
+        "id": 5,
+        "title": "Onboarding Completion Rate (24h)",
+        "type": "singlestat",
+        "gridPos": { "x": 0, "y": 10, "w": 6, "h": 4 },
+        "targets": [
+          {
+            "expr": "(sum(increase(lifeos_onboarding_step_completed_total{step=\"complete\"}[24h])) / sum(increase(lifeos_onboarding_step_completed_total{step=\"welcome\"}[24h]))) * 100",
+            "refId": "A"
+          }
+        ],
+        "format": "percent",
+        "valueName": "current",
+        "thresholds": "60,70,80",
+        "colors": ["#d44a3a", "#e0b400", "#299c46"]
+      },
+      {
+        "id": 6,
+        "title": "Data Ingestion Success Rate (1h)",
+        "type": "singlestat",
+        "gridPos": { "x": 6, "y": 10, "w": 6, "h": 4 },
+        "targets": [
+          {
+            "expr": "(sum(increase(lifeos_ingestion_total{status=\"success\"}[1h])) / sum(increase(lifeos_ingestion_total[1h]))) * 100",
+            "refId": "A"
+          }
+        ],
+        "format": "percent",
+        "valueName": "current",
+        "thresholds": "95,98,99",
+        "colors": ["#d44a3a", "#e0b400", "#299c46"]
+      },
+      {
+        "id": 7,
+        "title": "RAG Response Latency P95",
+        "type": "singlestat",
+        "gridPos": { "x": 12, "y": 10, "w": 6, "h": 4 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(lifeos_rag_query_duration_seconds_bucket[5m]))",
+            "refId": "A"
+          }
+        ],
+        "format": "s",
+        "valueName": "current",
+        "thresholds": "3.5,5",
+        "colors": ["#299c46", "#e0b400", "#d44a3a"]
+      },
+      {
+        "id": 8,
+        "title": "Action Execution Success Rate (1h)",
+        "type": "singlestat",
+        "gridPos": { "x": 18, "y": 10, "w": 6, "h": 4 },
+        "targets": [
+          {
+            "expr": "(sum(increase(lifeos_action_execution_total{status=\"success\"}[1h])) / sum(increase(lifeos_action_execution_total[1h]))) * 100",
+            "refId": "A"
+          }
+        ],
+        "format": "percent",
+        "valueName": "current",
+        "thresholds": "95,97,98",
+        "colors": ["#d44a3a", "#e0b400", "#299c46"]
+      },
+      {
+        "id": 9,
+        "title": "User Activity",
+        "type": "row",
+        "gridPos": { "x": 0, "y": 14, "w": 24, "h": 1 }
+      },
+      {
+        "id": 10,
+        "title": "Daily Active Users",
+        "type": "graph",
+        "gridPos": { "x": 0, "y": 15, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "count(count_over_time(lifeos_user_sessions_total[24h]))",
+            "legendFormat": "DAU",
+            "refId": "A"
+          },
+          {
+            "expr": "count(count_over_time(lifeos_user_sessions_total[7d]))",
+            "legendFormat": "WAU",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Users",
+            "format": "short"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "User Actions by Type",
+        "type": "graph",
+        "gridPos": { "x": 12, "y": 15, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "rate(lifeos_user_actions_total[5m])",
+            "legendFormat": "{{action_type}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Actions/sec",
+            "format": "short"
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "Data Ingestion",
+        "type": "row",
+        "gridPos": { "x": 0, "y": 23, "w": 24, "h": 1 }
+      },
+      {
+        "id": 13,
+        "title": "Ingestion Rate by Source",
+        "type": "graph",
+        "gridPos": { "x": 0, "y": 24, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "rate(lifeos_ingestion_total{status=\"success\"}[5m])",
+            "legendFormat": "{{source}} - Success",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(lifeos_ingestion_total{status=\"failure\"}[5m])",
+            "legendFormat": "{{source}} - Failure",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Ingestions/sec",
+            "format": "short"
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "title": "Ingestion Duration by Source",
+        "type": "graph",
+        "gridPos": { "x": 12, "y": 24, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(lifeos_ingestion_duration_seconds_bucket[5m]))",
+            "legendFormat": "P95 - {{source}}",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.50, rate(lifeos_ingestion_duration_seconds_bucket[5m]))",
+            "legendFormat": "P50 - {{source}}",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Duration (seconds)",
+            "format": "s"
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "title": "Database & Cache",
+        "type": "row",
+        "gridPos": { "x": 0, "y": 32, "w": 24, "h": 1 }
+      },
+      {
+        "id": 16,
+        "title": "Database Query Latency",
+        "type": "graph",
+        "gridPos": { "x": 0, "y": 33, "w": 8, "h": 8 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(lifeos_db_query_duration_seconds_bucket[5m]))",
+            "legendFormat": "P95 - {{operation}}",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.50, rate(lifeos_db_query_duration_seconds_bucket[5m]))",
+            "legendFormat": "P50 - {{operation}}",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Duration (seconds)",
+            "format": "s"
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "title": "Database Connection Pool",
+        "type": "graph",
+        "gridPos": { "x": 8, "y": 33, "w": 8, "h": 8 },
+        "targets": [
+          {
+            "expr": "lifeos_db_connection_pool_size",
+            "legendFormat": "{{state}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Connections",
+            "format": "short"
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "title": "Cache Hit Rate",
+        "type": "graph",
+        "gridPos": { "x": 16, "y": 33, "w": 8, "h": 8 },
+        "targets": [
+          {
+            "expr": "(rate(lifeos_cache_operations_total{operation=\"hit\"}[5m]) / (rate(lifeos_cache_operations_total{operation=\"hit\"}[5m]) + rate(lifeos_cache_operations_total{operation=\"miss\"}[5m]))) * 100",
+            "legendFormat": "Hit Rate %",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Hit Rate (%)",
+            "format": "percent",
+            "min": 0,
+            "max": 100
+          }
+        ]
+      },
+      {
+        "id": 19,
+        "title": "Action Engine",
+        "type": "row",
+        "gridPos": { "x": 0, "y": 41, "w": 24, "h": 1 }
+      },
+      {
+        "id": 20,
+        "title": "Action Queue Size",
+        "type": "graph",
+        "gridPos": { "x": 0, "y": 42, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "lifeos_action_queue_size",
+            "legendFormat": "Queue Size",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Actions",
+            "format": "short"
+          }
+        ],
+        "alert": {
+          "conditions": [
+            {
+              "evaluator": {
+                "params": [100],
+                "type": "gt"
+              },
+              "operator": {
+                "type": "and"
+              },
+              "query": {
+                "params": ["A", "5m", "now"]
+              },
+              "reducer": {
+                "params": [],
+                "type": "avg"
+              },
+              "type": "query"
+            }
+          ],
+          "name": "High Action Queue Size"
+        }
+      },
+      {
+        "id": 21,
+        "title": "Action Execution Duration",
+        "type": "graph",
+        "gridPos": { "x": 12, "y": 42, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(lifeos_action_execution_duration_seconds_bucket[5m]))",
+            "legendFormat": "P95 - {{action_type}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Duration (seconds)",
+            "format": "s"
+          }
+        ]
+      },
+      {
+        "id": 22,
+        "title": "External APIs",
+        "type": "row",
+        "gridPos": { "x": 0, "y": 50, "w": 24, "h": 1 }
+      },
+      {
+        "id": 23,
+        "title": "External API Latency",
+        "type": "graph",
+        "gridPos": { "x": 0, "y": 51, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(lifeos_external_api_duration_seconds_bucket[5m]))",
+            "legendFormat": "P95 - {{service}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Duration (seconds)",
+            "format": "s"
+          }
+        ]
+      },
+      {
+        "id": 24,
+        "title": "External API Error Rate",
+        "type": "graph",
+        "gridPos": { "x": 12, "y": 51, "w": 12, "h": 8 },
+        "targets": [
+          {
+            "expr": "rate(lifeos_external_api_errors_total[5m])",
+            "legendFormat": "{{service}} - {{error_type}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Errors/sec",
+            "format": "short"
+          }
+        ]
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "datasource",
+          "type": "datasource",
+          "query": "prometheus"
+        },
+        {
+          "name": "environment",
+          "type": "query",
+          "datasource": "$datasource",
+          "query": "label_values(lifeos_http_requests_total, environment)",
+          "multi": false,
+          "includeAll": false
+        }
+      ]
+    },
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h"]
+    }
+  }
+}
