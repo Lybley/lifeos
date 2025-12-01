@@ -1,89 +1,65 @@
 <analysis>**original_problem_statement:**
 The user has provided a series of requests to build a multi-service application called lifeos-core.
 
-**Phase 1: Project Scaffolding**
-- Create a new project scaffold named lifeos-core.
-- Tech Stack:
-    - Backend: Node.js + Express (TypeScript)
-    - DB: PostgreSQL (metadata), Neo4j (graph nodes), Pinecone (vector store)
-    - Worker: BullMQ (Redis)
-    - Frontend: Next.js (React + TypeScript)
-    - Auth: OAuth2 (Auth0)
-    - Containerization: Docker + Kubernetes manifests
-    - CI: GitHub Actions
-- Deliverables: Repository file structure, , ,  for backend and frontend, and basic Kubernetes manifests.
-
-**Phase 2: Personal Memory Graph (PMG) Schema Design**
-- Design a PMG schema for LifeOS.
-- Use Neo4j for graph nodes and PostgreSQL for transactional metadata.
-- Define node types, properties, relationships, and indexes for , , , , , .
-- Provide Cypher DDL, PostgreSQL  statements, example records, and a design rationale.
-
-**Phase 3: Ingestion Service**
-- Build a Node.js TypeScript service ingest-service.
-- It should accept file uploads (PDF, TXT, DOCX) and text.
-- Implement OCR using a Tesseract wrapper.
-- Chunk documents into ~512-token chunks.
-- Create vectors via an embeddings API (OpenAI or local Llama).
-- Store metadata in PostgreSQL, vectors in Pinecone, and graph nodes/edges in Neo4j.
-- Deliverables:  endpoint, chunker function, pluggable embedding client, Neo4j save function, and Jest unit tests.
-
-**Phase 4: Gmail Connector**
-- Build a gmail-connector microservice.
-- Use OAuth2 to connect to Gmail (readonly mail scope).
-- Fetch the last 6 months of emails and ingest them into the PMG.
-- Create  nodes in Neo4j, generate/store embeddings in Pinecone, and add metadata to PostgreSQL.
-- Deliverables: OAuth flow routes, token refresh logic, a background worker for fetching emails with retry logic, and a test plan for rate limit handling.
-
-**Phase 5: Google Drive & Calendar Connectors (Current)**
-- Create two new connector services:
-    1.  **Google Drive**: List files, download content, perform OCR if needed, and ingest into PMG.
-    2.  **Google Calendar**: Import events, create  nodes with relationships to  nodes (attendees).
-- Produce endpoints, OAuth flow, and a background sync scheduler for both.
+- **Phase 1-4 (Completed in previous jobs):** Scaffold the project (Node.js/Express backend, Next.js frontend, PostgreSQL, Neo4j, Pinecone DBs), design the Personal Memory Graph (PMG) schema, and build an ingestion service and a Gmail connector.
+- **Phase 5 (In Progress):** Create Google Drive and Google Calendar connector microservices to ingest files and events into the PMG.
+- **New Request 1:** Build a RAG (Retrieval-Augmented Generation) API endpoint () in the main backend service. This should include vector search, graph context retrieval, a pluggable LLM client, prompt templating, and Redis caching.
+- **New Request 2:** Generate three optimized prompt templates for: Factual Q&A, Summarization, and Task Extraction.
+- **New Request 3:** Create a TaskExtractor agent pipeline to extract actionable tasks from text, store them in Neo4j and PostgreSQL, and handle low-confidence items.
+- **New Request 4:** Build two more AI agents: a Summarizer agent (1-sentence and 3-bullet summaries) and a Drafting agent (drafts email replies in a user's voice).
+- **New Request 5 (Current):** Design and implement an Action Engine to execute actions (e.g., ) from a queue, with approval flows, audit logs, and safety checks.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The agent has successfully scaffolded a large, multi-service project structure for lifeos-core. This includes several distinct Node.js/TypeScript microservices (, , , ), a Next.js frontend, and extensive configuration for Docker and Kubernetes. The core architecture revolves around a Personal Memory Graph (PMG) that integrates PostgreSQL, Neo4j, and Pinecone. Most of the requested services have been scaffolded with their basic file structure, dependencies, and configuration. The  and  are the most complete, containing logic for their primary functions.
+The project is a large, multi-service monorepo. The initial scaffolding for multiple microservices (, , , , ) is complete. The agent has implemented a significant number of features within the main  service, including a complete RAG pipeline, several AI agent pipelines (TaskExtractor, Summarizer, Drafting), and has just begun implementing a new Action Engine. Most of the code for these features has been generated, but they have not been tested or integrated with the frontend.
 
 **Last working item**:
-- **Last item agent was working**: The agent began scaffolding the two new connector services requested by the user:  and . It created  for both and started creating initial service files for the Drive connector. The agent was just about to create the files for the Calendar connector.
+- **Last item agent was working**: Implementing the Action Engine within the main  service. The agent created the initial database schema (), type definitions (), and placeholder action handlers (). It was about to create the safety checks and the core worker logic for processing actions from the queue.
 - **Status**: IN PROGRESS
 - **Agent Testing Done**: N
 - **Which testing method agent to use?**: backend testing agent
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-There are no known bugs or issues. The work is focused on new feature development.
+There are no known bugs. The focus is on completing new feature development.
 
 **In progress Task List**:
-- **Task 1**: Complete the  service (P0)
-  - **Where to resume**: The service has a  and two initial files (, ). The next steps are to build out the Express server, OAuth2 flow, API routes, background sync logic, and integration with the PMG databases (PostgreSQL, Neo4j, Pinecone).
-  - **What will be achieved with this?**: A functional microservice that can connect to a user's Google Drive, read their files, and ingest them into the LifeOS Personal Memory Graph.
-  - **Status**: IN PROGRESS
-  - **Should Test frontend/backend/both after fix?**: backend
-  - **Blocked on something**: Needs Google OAuth credentials to be fully tested.
+- **Task 1**: Complete the  implementation (P0)
+    - **Where to resume**: In the  directory. The next steps are to implement the safety checks, the core worker logic for executing actions, the API endpoints for approval/rejection, and the email notification system with secure links.
+    - **What will be achieved with this?**: A system that can safely and reliably execute actions requested by AI agents, with a human-in-the-loop for approvals.
+    - **Status**: IN PROGRESS
+    - **Should Test frontend/backend/both after fix?**: backend
+    - **Blocked on something**: No.
 
-- **Task 2**: Implement the  service (P1)
-  - **Where to resume**: Only the  file has been created. The entire service needs to be built from scratch, including the Express server, OAuth2 flow, API routes, logic to fetch calendar events, and functions to create  and  nodes in Neo4j.
-  - **What will be achieved with this?**: A functional microservice that can connect to a user's Google Calendar, read their events, and ingest them into the LifeOS Personal Memory Graph.
-  - **Status**: NOT STARTED
-  - **Should Test frontend/backend/both after fix?**: backend
-  - **Blocked on something**: Needs Google OAuth credentials to be fully tested.
+- **Task 2**: Complete the  service (P1)
+    - **Where to resume**: The service files have been scaffolded in . The logic for OAuth, file fetching, processing, and ingesting into the PMG needs to be implemented. The agent pivoted to other tasks after creating the file structure.
+    - **What will be achieved with this?**: A functional microservice to sync a user's Google Drive files into the LifeOS PMG.
+    - **Status**: NOT STARTED (implementation-wise)
+    - **Should Test frontend/backend/both after fix?**: backend
+    - **Blocked on something**: Needs Google OAuth credentials for testing.
+
+- **Task 3**: Complete the  service (P1)
+    - **Where to resume**: The service files have been scaffolded in . The logic for OAuth, event fetching, and creating graph nodes in Neo4j needs to be implemented.
+    - **What will be achieved with this?**: A functional microservice to sync a user's Google Calendar events into the LifeOS PMG.
+    - **Status**: NOT STARTED (implementation-wise)
+    - **Should Test frontend/backend/both after fix?**: backend
+    - **Blocked on something**: Needs Google OAuth credentials for testing.
 
 **Upcoming and Future Tasks**
-- Integrate all microservices with the frontend to provide a user interface for connecting accounts and viewing ingested data.
-- Implement the Auth0 OAuth2 flow in the frontend and backend.
-- Wire up the BullMQ worker to handle background tasks from all services.
-- Finalize and test the Kubernetes deployment manifests for a production environment.
+- **UI Integration (P0)**: Integrate all the new backend agents and services (RAG, Task Extractor, Summarizer, Action Engine) with the frontend.
+- **Auth0 Integration (P1)**: Implement the full Auth0 OAuth2 flow in the frontend and backend for user authentication.
+- **Worker Integration (P2)**: Wire up the central BullMQ worker to handle background tasks from all microservices.
+- **Testing (P2)**: Conduct thorough end-to-end testing of all implemented features.
+- **Kubernetes Deployment (P3)**: Finalize and test the Kubernetes deployment manifests for a production environment.
 
 **Completed work in this session**
-- **Project Scaffolding**: Created the entire monorepo structure for  including , , , , and  directories.
-- **PMG Schema**: Designed and documented the schema for the Personal Memory Graph in .
-- **Ingestion Service**: Built the  with endpoints for file uploads, chunking, embedding, and storage logic.
-- **Gmail Connector**: Built the  with OAuth2 flow, background sync queue, and logic to ingest emails into the PMG.
-- **Containerization**: Created s for all services and a  for local development.
-- **CI/CD**: Set up a basic CI pipeline using GitHub Actions in .
+- **Google Connectors Scaffolding**: Created the complete file structure, dependencies, and configuration for the  and .
+- **RAG API Implementation**: Built the  endpoint with vector search, graph context retrieval, a pluggable LLM client, and Redis caching in .
+- **Specialized Prompt Templates**: Created three optimized prompt templates for Q&A, Summarization, and Task Extraction.
+- **TaskExtractor Agent**: Implemented a full agent pipeline to extract tasks from text, including prompts, persistence logic, and API routes ().
+- **Summarizer & Drafting Agents**: Implemented two additional agents for document summarization and email drafting ().
+- **Action Engine (Initial)**: Began implementation of the Action Engine by creating schemas, types, and action handlers ().
 
 **Earlier issues found/mentioned but not fixed**
 None.
@@ -92,61 +68,54 @@ None.
 None.
 
 **Code Architecture**
-The project follows a microservices architecture. Each service resides in its own top-level directory (e.g., , , ).
+The project uses a microservices architecture within a monorepo.
 
+The  service is becoming a monolith for AI capabilities, containing subdirectories for , , and  under .
 
 **Key Technical Concepts**
 - **Architecture**: Microservices
 - **Backend**: Node.js, Express, TypeScript
 - **Frontend**: Next.js, React, TypeScript
-- **Databases**:
-    - **PostgreSQL**: For relational metadata, logs, and permissions.
-    - **Neo4j**: For the core graph structure of the Personal Memory Graph (PMG).
-    - **Pinecone**: For storing and querying vector embeddings.
-- **Asynchronous Tasks**: BullMQ with Redis for background job processing.
-- **Authentication**: OAuth2 for connecting to external services (Google).
-- **Containerization**: Docker, Docker Compose
-- **Orchestration**: Kubernetes
+- **Databases**: PostgreSQL (metadata, queues), Neo4j (graph), Pinecone (vectors)
+- **AI Orchestration**: LangChain.js for RAG and agent pipelines.
+- **Caching**: Redis for RAG query caching.
+- **Asynchronous Tasks**: BullMQ with Redis.
+- **Authentication**: OAuth2 for external services (Google).
+- **Containerization**: Docker, Docker Compose.
 
 **key DB schema**
-- **PostgreSQL**:
-    - : Records metadata about ingested items (e.g., , , ).
-    - : Manages user access to different data sources.
-    - : Maps chunks of text to their corresponding vectors in Pinecone.
-    - : Stores Gmail-specific information (, , ).
-- **Neo4j**:
-    - **Nodes**: , , , , , , .
-    - **Relationships**: , , , , , etc. to connect the nodes in a meaningful graph.
+- ** (PostgreSQL)**: 
+- ** (PostgreSQL)**: 
+- ** (PostgreSQL)**: Added schema for tasks extracted by the .
+- **Neo4j**:  nodes are created with relationships to  (assignee) and the source /.
 
 **changes in tech stack**
-N/A. New project.
+- Added  and related libraries to the  service for RAG and agent implementation.
 
 **All files**
-Over 50 files were created, establishing the full project structure. Key new directories include:
-- : Main API service.
-- : Next.js application.
-- : Background job processor.
-- : Service for handling file ingestion.
-- : Service for syncing Gmail messages.
-- : Stub for the Google Drive service.
-- : Kubernetes deployment files.
-- : Documentation for the PMG schema.
+- : All files for the RAG pipeline.
+- : Files for , , .
+- : Initial files for the Action Engine (, , ).
+- : New route files , , .
+- : Complete scaffolded file structure.
+- : Complete scaffolded file structure.
+- : Multiple new guides (, , , etc.).
 
 **Areas that need refactoring**:
-None at this stage. The code is newly generated.
+- The  service is growing large. The  directory, which now contains RAG, multiple agents, and the action engine, could be broken down into more organized modules to improve maintainability.
 
 **key api endpoints**
-- :  for file and text ingestion.
-- :
-    - : Initiates the Google OAuth2 flow.
-    - : Handles the OAuth2 callback.
-    - : Triggers a background sync for the user's emails.
+- : Executes a RAG query.
+- : Runs the TaskExtractor agent on a piece of text.
+- : Runs the Summarizer agent.
+- : Runs the Drafting agent.
+- : Planned endpoint for the Action Engine.
 
 **Critical Info for New Agent**
-- The project is composed of multiple independent microservices. When working on a task, ensure you are in the correct service's directory.
-- All services that interact with Google APIs (, , ) will require Google Cloud Platform OAuth2 client ID and secret. The agent will need to be prepared to ask the user for these if it intends to run or test the services.
-- The core data model is the Personal Memory Graph (PMG), which is a combination of three databases. Data is intentionally spread across them based on its type (metadata in Postgres, graph relationships in Neo4j, vectors in Pinecone).
-- Environment variables are managed via  files in each service. The agent should create  files based on these examples and populate them with necessary credentials.
+- The immediate priority is to complete the . This is a critical component that other AI agents will rely on to perform actions.
+- After scaffolding the Google connectors, the agent pivoted to a series of complex backend features. The connectors are still just empty shells and need full implementation.
+- None of the newly created backend features (RAG, Agents, Action Engine) have been tested in a real-world scenario or integrated with the frontend. This is a major pending work area.
+- The project requires numerous credentials for databases (Postgres, Neo4j, Pinecone), Google APIs, and the LLM provider. These must be configured in the respective  files for each service.
 
 **documents created in this job**
 - 
@@ -158,36 +127,60 @@ None at this stage. The code is newly generated.
 - 
 - 
 - 
-- 
-- 
 
 **Last 5 User Messages and any pending user messages**
-1.  **User Request**: Build an ingest-service for processing files and storing them in the PMG.
-    - **Status**: Completed.
-2.  **User Request**: Build a gmail-connector microservice to sync emails into the PMG.
-    - **Status**: Completed.
-3.  **User Request**: Create two more connectors: one for Google Drive and one for Google Calendar.
-    - **Status**: IN PROGRESS. This is the current active task.
+1.  **User**: Build a RAG API endpoint. **Status**: Completed.
+2.  **User**: Create 3 specialized prompt templates. **Status**: Completed.
+3.  **User**: Create a TaskExtractor agent pipeline. **Status**: Completed.
+4.  **User**: Build Summarizer and Drafting agents. **Status**: Completed.
+5.  **User**: Design and implement an Action Engine. **Status**: IN PROGRESS.
 
 **Project Health Check:**
 - **Broken**: None.
-- **Mocked**: All services are essentially scaffolds. They have the structure and code but have not been run or tested in an integrated environment. They lack real credentials and are not yet connected to the frontend.
+- **Mocked**: The RAG, AI Agents, and Action Engine features are code-complete but not integrated or tested end-to-end. The Google Drive/Calendar connectors are pure scaffolds with no implementation logic. The entire frontend integration is missing for these new features.
 
 **Testing status**
 - **Testing agent used after significant changes**: NO
 - **Troubleshoot agent used after agent stuck in loop**: NO
 - **Test files created**:
-    - 
-    - 
+  - 
+  - 
+  - === RAG API cURL Examples ===
+
+1. Basic Query
+---
+
+
+2. Advanced Query with Custom Parameters
+---
+
+
+3. Batch Queries
+---
+
+
+4. Cache Statistics
+---
+
+
+5. Invalidate User Cache
+---
+
+
+6. RAG Service Health Check
+---
+
+
+=== Examples Complete ===
+  - 
 - **Known regressions**: None.
 
 **Credentials to test flow:**
-The following credentials will be needed to test the various services. The user should be prompted to provide them and they should be stored in the appropriate  files for each service.
 - **PostgreSQL**: DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME
 - **Neo4j**: NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
 - **Pinecone**: PINECONE_API_KEY, PINECONE_ENVIRONMENT
-- **OpenAI/Llama**: EMBEDDING_API_KEY, EMBEDDING_API_URL
-- **Google OAuth**: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET (for Gmail, Drive, and Calendar connectors)
+- **LLM Provider**: EMERGENT_LLM_KEY (or other provider keys).
+- **Google OAuth**: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET (for Gmail, Drive, and Calendar connectors).
 
 **What agent forgot to execute**
-The agent was in the middle of creating the Google Drive and Calendar connectors when the session ended. The immediate next step is to continue building out the  and then completing the .</analysis>
+The agent did not complete the implementation of the  and  services after scaffolding them. It pivoted to several other large features requested by the user, leaving the connector implementation pending. No end-to-end testing has been performed for any of the newly created RAG or AI agent features.</analysis>
