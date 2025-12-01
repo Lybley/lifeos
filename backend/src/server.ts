@@ -5,10 +5,12 @@ import compression from 'compression';
 import morgan from 'morgan';
 import 'express-async-errors';
 import dotenv from 'dotenv';
+import { createServer } from 'http';
 import { postgresClient } from './config/postgres';
 import { neo4jDriver } from './config/neo4j';
 import { pineconeClient } from './config/pinecone';
 import { queueConnection } from './config/queue';
+import { initializeWebSocket } from './config/websocket';
 import logger from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
 import { authMiddleware } from './middleware/auth';
@@ -19,6 +21,7 @@ dotenv.config();
 
 const app: Application = express();
 const PORT = process.env.PORT || 8000;
+const httpServer = createServer(app);
 
 // Middleware
 app.use(helmet());
@@ -82,9 +85,13 @@ const startServer = async () => {
   try {
     await initializeDatabases();
     
-    app.listen(PORT, () => {
+    // Initialize WebSocket server
+    initializeWebSocket(httpServer);
+    
+    httpServer.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`);
       logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+      logger.info(`WebSocket server enabled`);
     });
   } catch (error) {
     logger.error('Failed to start server:', error);
