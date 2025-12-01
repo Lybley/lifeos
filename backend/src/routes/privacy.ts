@@ -222,14 +222,12 @@ router.get('/audit-logs', async (req: Request, res: Response) => {
     const query = `
       SELECT 
         id,
-        action_id,
         event_type,
         event_data,
-        source,
         ip_address,
         user_agent,
         created_at
-      FROM action_audit_logs
+      FROM privacy_audit_logs
       WHERE user_id = $1
       ORDER BY created_at DESC
       LIMIT $2 OFFSET $3
