@@ -93,6 +93,7 @@ startServer();
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   logger.info('SIGTERM received, shutting down gracefully');
+  await actionWorker.close();
   await postgresClient.end();
   await neo4jDriver.close();
   await queueConnection.close();
