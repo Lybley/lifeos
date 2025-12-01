@@ -206,7 +206,8 @@ export async function incrementRateLimit(
       
       // Increment has already happened in checkRateLimit
       // This function is here for explicit tracking if needed
-      logger.info(`Rate limit incremented for ${rateLimitKey}`);\n    }
+      logger.info(`Rate limit incremented for ${rateLimitKey}`);
+    }
   } catch (error) {
     logger.error('Failed to increment rate limit:', error);
   }
