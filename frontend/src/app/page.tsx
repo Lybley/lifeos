@@ -1,121 +1,215 @@
 'use client';
 
-import { useUser } from '@auth0/nextjs-auth0/client';
+import React, { useEffect, useState } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Brain, MessageSquare, Upload, Link as LinkIcon, TrendingUp, Clock, CheckCircle } from 'lucide-react';
+import apiClient from '@/lib/api-client';
 import Link from 'next/link';
 
-export default function Home() {
-  const { user, isLoading } = useUser();
+export default function DashboardPage() {
+  const [stats, setStats] = useState({
+    totalNodes: 0,
+    connections: 3,
+    recentChats: 12,
+    actionsToday: 5,
+  });
 
-  if (isLoading) {
-    return (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <p>Loading...</p>
-      </div>
-    );
-  }
+  const [recentActivity, setRecentActivity] = useState([
+    { id: 1, type: 'chat', title: 'Asked about Q4 meetings', time: '5 minutes ago' },
+    { id: 2, type: 'action', title: 'Created calendar event', time: '1 hour ago' },
+    { id: 3, type: 'sync', title: 'Gmail sync completed', time: '2 hours ago' },
+    { id: 4, type: 'upload', title: 'Uploaded 3 documents', time: '3 hours ago' },
+  ]);
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const nodes = await apiClient.getNodes();
+        setStats(prev => ({ ...prev, totalNodes: nodes.length || 0 }));
+      } catch (error) {
+        console.error('Failed to load stats:', error);
+      }
+    };
+    loadStats();
+  }, []);
+
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case 'chat':
+        return <MessageSquare className="w-5 h-5 text-blue-600" />;
+      case 'action':
+        return <CheckCircle className="w-5 h-5 text-green-600" />;
+      case 'sync':
+        return <LinkIcon className="w-5 h-5 text-purple-600" />;
+      case 'upload':
+        return <Upload className="w-5 h-5 text-orange-600" />;
+      default:
+        return <Clock className="w-5 h-5 text-gray-600" />;
+    }
+  };
 
   return (
-    <main style={{ minHeight: '100vh', padding: '2rem' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <header style={{ marginBottom: '3rem', textAlign: 'center' }}>
-          <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>LifeOS Core</h1>
-          <p style={{ fontSize: '1.25rem', color: '#666' }}>
-            Graph-based knowledge management with AI-powered search
-          </p>
-        </header>
-
-        <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
-          {user ? (
-            <div>
-              <p style={{ marginBottom: '1rem' }}>Welcome, {user.name}!</p>
-              <Link
-                href="/api/auth/logout"
-                style={{
-                  padding: '0.75rem 2rem',
-                  background: '#dc2626',
-                  color: 'white',
-                  borderRadius: '0.5rem',
-                  display: 'inline-block',
-                }}
-              >
-                Logout
-              </Link>
-            </div>
-          ) : (
-            <Link
-              href="/api/auth/login"
-              style={{
-                padding: '0.75rem 2rem',
-                background: '#2563eb',
-                color: 'white',
-                borderRadius: '0.5rem',
-                display: 'inline-block',
-              }}
-            >
-              Login with Auth0
-            </Link>
-          )}
-        </div>
-
-        {user && (
-          <div style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
-            <div style={{ padding: '2rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem' }}>
-              <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Graph Nodes</h2>
-              <p style={{ color: '#666', marginBottom: '1rem' }}>Manage your knowledge graph with Neo4j</p>
-              <Link
-                href="/nodes"
-                style={{
-                  padding: '0.5rem 1rem',
-                  background: '#10b981',
-                  color: 'white',
-                  borderRadius: '0.375rem',
-                  display: 'inline-block',
-                }}
-              >
-                View Nodes
-              </Link>
-            </div>
-
-            <div style={{ padding: '2rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem' }}>
-              <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Vector Search</h2>
-              <p style={{ color: '#666', marginBottom: '1rem' }}>Semantic search powered by Pinecone</p>
-              <Link
-                href="/vectors"
-                style={{
-                  padding: '0.5rem 1rem',
-                  background: '#8b5cf6',
-                  color: 'white',
-                  borderRadius: '0.375rem',
-                  display: 'inline-block',
-                }}
-              >
-                Search Vectors
-              </Link>
-            </div>
-
-            <div style={{ padding: '2rem', border: '1px solid #e5e7eb', borderRadius: '0.5rem' }}>
-              <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Background Jobs</h2>
-              <p style={{ color: '#666', marginBottom: '1rem' }}>Monitor queue with BullMQ</p>
-              <Link
-                href="/jobs"
-                style={{
-                  padding: '0.5rem 1rem',
-                  background: '#f59e0b',
-                  color: 'white',
-                  borderRadius: '0.375rem',
-                  display: 'inline-block',
-                }}
-              >
-                View Jobs
-              </Link>
-            </div>
-          </div>
-        )}
-
-        <footer style={{ marginTop: '4rem', textAlign: 'center', color: '#666' }}>
-          <p>Powered by Node.js, Express, Next.js, PostgreSQL, Neo4j, Pinecone, and BullMQ</p>
-        </footer>
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">
+          Welcome back! Here's what's happening with your LifeOS.
+        </p>
       </div>
-    </main>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Link href="/memory">
+          <Card hover className="h-full">
+            <CardContent className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Total Memories</p>
+                <p className="text-3xl font-bold">{stats.totalNodes}</p>
+                <Badge variant="success" size="sm" className="mt-2">
+                  <TrendingUp className="w-3 h-3 mr-1" />
+                  +12% this week
+                </Badge>
+              </div>
+              <Brain className="w-12 h-12 text-primary-600 opacity-50" />
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/connections">
+          <Card hover className="h-full">
+            <CardContent className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Connections</p>
+                <p className="text-3xl font-bold">{stats.connections}</p>
+                <Badge variant="info" size="sm" className="mt-2">
+                  Active
+                </Badge>
+              </div>
+              <LinkIcon className="w-12 h-12 text-green-600 opacity-50" />
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/chat">
+          <Card hover className="h-full">
+            <CardContent className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Recent Chats</p>
+                <p className="text-3xl font-bold">{stats.recentChats}</p>
+                <Badge variant="default" size="sm" className="mt-2">
+                  This week
+                </Badge>
+              </div>
+              <MessageSquare className="w-12 h-12 text-blue-600 opacity-50" />
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/actions">
+          <Card hover className="h-full">
+            <CardContent className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Actions Today</p>
+                <p className="text-3xl font-bold">{stats.actionsToday}</p>
+                <Badge variant="warning" size="sm" className="mt-2">
+                  2 pending
+                </Badge>
+              </div>
+              <CheckCircle className="w-12 h-12 text-purple-600 opacity-50" />
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Link href="/chat">
+          <Button variant="outline" className="w-full justify-start" size="lg">
+            <MessageSquare className="w-5 h-5 mr-2" />
+            Ask a Question
+          </Button>
+        </Link>
+        <Link href="/upload">
+          <Button variant="outline" className="w-full justify-start" size="lg">
+            <Upload className="w-5 h-5 mr-2" />
+            Upload Files
+          </Button>
+        </Link>
+        <Link href="/connections">
+          <Button variant="outline" className="w-full justify-start" size="lg">
+            <LinkIcon className="w-5 h-5 mr-2" />
+            Manage Connections
+          </Button>
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Activity */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {recentActivity.map((activity) => (
+                <div
+                  key={activity.id}
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                >
+                  {getActivityIcon(activity.type)}
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">{activity.title}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{activity.time}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Insights */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Insights</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <p className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-1">
+                  Most Active Contact
+                </p>
+                <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                  Sarah Johnson
+                </p>
+                <p className="text-xs text-blue-700 dark:text-blue-300">47 interactions this month</p>
+              </div>
+
+              <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                <p className="text-sm font-medium text-purple-900 dark:text-purple-200 mb-1">
+                  Most Referenced Topic
+                </p>
+                <p className="text-lg font-bold text-purple-600 dark:text-purple-400">
+                  Q4 Planning
+                </p>
+                <p className="text-xs text-purple-700 dark:text-purple-300">Mentioned in 23 documents</p>
+              </div>
+
+              <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                <p className="text-sm font-medium text-green-900 dark:text-green-200 mb-1">
+                  Upcoming Deadline
+                </p>
+                <p className="text-lg font-bold text-green-600 dark:text-green-400">
+                  Project Proposal
+                </p>
+                <p className="text-xs text-green-700 dark:text-green-300">Due in 3 days</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }
