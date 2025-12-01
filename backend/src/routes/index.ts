@@ -2,6 +2,7 @@ import { Router } from 'express';
 import nodesRouter from './nodes';
 import vectorsRouter from './vectors';
 import jobsRouter from './jobs';
+import ragRouter from './rag';
 
 const router = Router();
 
@@ -9,6 +10,7 @@ const router = Router();
 router.use('/nodes', nodesRouter);
 router.use('/vectors', vectorsRouter);
 router.use('/jobs', jobsRouter);
+router.use('/v1/rag', ragRouter);
 
 // API info
 router.get('/', (req, res) => {
@@ -19,6 +21,7 @@ router.get('/', (req, res) => {
       nodes: '/api/nodes',
       vectors: '/api/vectors',
       jobs: '/api/jobs',
+      rag: '/api/v1/rag',
     },
   });
 });
