@@ -104,6 +104,9 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
+      {/* Privacy & Encryption Settings */}
+      <PrivacySettings userId="demo-user" />
+
       {/* Data & Privacy */}
       <Card>
         <CardHeader>
