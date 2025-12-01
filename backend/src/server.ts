@@ -15,7 +15,8 @@ import logger from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
 import { authMiddleware } from './middleware/auth';
 import apiRoutes from './routes';
-import { actionWorker } from './services/actionEngine/worker';
+// Worker will be initialized conditionally
+let actionWorker: any = null;
 
 dotenv.config();
 
@@ -81,6 +82,15 @@ const startServer = async () => {
   try {
     await initializeDatabases();
     
+    // Initialize action worker if Redis is available
+    try {
+      const { actionWorker: worker } = await import('./services/actionEngine/worker');
+      actionWorker = worker;
+      logger.info('Action Engine worker initialized');
+    } catch (workerError) {
+      logger.warn('Action worker not initialized (Redis may not be available)');
+    }
+    
     // Initialize WebSocket server
     initializeWebSocket(httpServer);
     
@@ -100,10 +110,18 @@ startServer();
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   logger.info('SIGTERM received, shutting down gracefully');
-  await actionWorker.close();
-  await postgresClient.end();
-  await neo4jDriver.close();
-  await queueConnection.close();
+  
+  try {
+    if (actionWorker) {
+      await actionWorker.close();
+    }
+    await postgresClient.end();
+    await neo4jDriver.close();
+    await queueConnection.close();
+  } catch (err) {
+    logger.warn('Error during shutdown:', err);
+  }
+  
   process.exit(0);
 });
 
