@@ -135,7 +135,7 @@ class LifeOSTestSuite:
                     return False
                 
                 self.log_test("Privacy Encryption Settings - GET", True, 
-                             f"Encryption tier: {settings.get('encryption_tier')}, Vault: {settings.get('vault_enabled')}")
+                             f"Encryption tier: {settings.get('encryptionTier')}, Vault: {settings.get('vaultEnabled')}")
                 return True
             else:
                 self.log_test("Privacy Encryption Settings - GET", False, f"Unexpected response: {data}")
