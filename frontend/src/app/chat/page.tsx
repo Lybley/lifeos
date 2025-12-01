@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ChatContainer, Message, Citation } from '@/components/chat/ChatContainer';
+import { ChatContainer } from '@/components/chat/ChatContainer';
+import { Message, Citation } from '@/components/chat/ChatMessage';
 import apiClient from '@/lib/api-client';
 import wsService from '@/lib/websocket';
 
