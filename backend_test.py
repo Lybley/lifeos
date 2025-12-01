@@ -282,7 +282,7 @@ class LifeOSTestSuite:
                 "subject": "Test Email",
                 "body": "This is a test email from LifeOS"
             },
-            "priority": "medium"
+            "priority": 5
         }
         
         success, response, error = self.make_request('POST', '/api/actions', data=action_data)
