@@ -81,7 +81,7 @@ export class TaskExtractorAgent {
       ? new Date(input.metadata.date)
       : new Date();
 
-    logger.info(`Starting task extraction for source: ${input.metadata.source_id}`);\n
+    logger.info(`Starting task extraction for source: ${input.metadata.source_id}`);
     try {
       // Step 1: Build prompt and call LLM
       const userPrompt = buildTaskExtractionPrompt(input, referenceDate);
