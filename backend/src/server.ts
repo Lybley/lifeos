@@ -13,6 +13,7 @@ import logger from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
 import { authMiddleware } from './middleware/auth';
 import apiRoutes from './routes';
+import { actionWorker } from './services/actionEngine/worker';
 
 dotenv.config();
 
