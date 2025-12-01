@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { User, Bell, Lock, Database, Zap } from 'lucide-react';
+import PrivacySettings from '@/components/settings/PrivacySettings';
 
 export default function SettingsPage() {
   const [profile, setProfile] = useState({
