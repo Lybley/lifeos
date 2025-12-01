@@ -68,7 +68,7 @@ const initializeDatabases = async () => {
     }
 
     // Test Redis connection
-    await queueConnection.client.ping();
+    await queueConnection.ping();
     logger.info('Redis connected successfully');
 
   } catch (error) {
