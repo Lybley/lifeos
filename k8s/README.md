@@ -1,343 +1,173 @@
-# Kubernetes Deployment Guide
-
-This directory contains Kubernetes manifests for deploying LifeOS Core to a production cluster.
+# LifeOS Kubernetes Deployment Guide
 
 ## Prerequisites
 
-- Kubernetes cluster (v1.24+)
-- `kubectl` configured to access your cluster
-- Docker images built and pushed to a registry
-- Ingress controller (nginx recommended)
-- Certificate manager (cert-manager for TLS)
+- Kubernetes cluster (v1.28+)
+- kubectl configured
+- Helm 3.x
+- cert-manager (for TLS certificates)
+- nginx-ingress-controller
+- metrics-server (for HPA)
 
-## Quick Deploy
+## Quick Start
 
-```bash
-# Apply all manifests
-kubectl apply -f .
-
-# Check deployment status
-kubectl get all -n lifeos
-
-# Watch pods come online
-kubectl get pods -n lifeos -w
-```
-
-## Detailed Deployment Steps
-
-### Step 1: Update Secrets
-
-Before deploying, update `secrets.yaml` with your actual credentials:
-
-```yaml
-stringData:
-  POSTGRES_USER: "your_postgres_user"
-  POSTGRES_PASSWORD: "strong_password_here"
-  NEO4J_PASSWORD: "strong_password_here"
-  PINECONE_API_KEY: "your_actual_pinecone_key"
-  AUTH0_DOMAIN: "your-tenant.auth0.com"
-  AUTH0_CLIENT_ID: "your_actual_client_id"
-  AUTH0_CLIENT_SECRET: "your_actual_client_secret"
-```
-
-**Important:** Never commit real secrets to version control!
-
-### Step 2: Update ConfigMap (if needed)
-
-Edit `configmap.yaml` if you need to change non-sensitive configuration:
-
-```yaml
-data:
-  NODE_ENV: "production"
-  POSTGRES_PORT: "5432"
-  # ... other config
-```
-
-### Step 3: Update Ingress
-
-Edit `ingress.yaml` to use your actual domain:
-
-```yaml
-spec:
-  tls:
-  - hosts:
-    - your-domain.com  # Change this
-    secretName: lifeos-tls
-  rules:
-  - host: your-domain.com  # Change this
-```
-
-### Step 4: Build and Push Docker Images
+### 1. Create Namespace
 
 ```bash
-# Build images
-docker build -t your-registry/lifeos-backend:latest ./backend
-docker build -t your-registry/lifeos-frontend:latest ./frontend
-docker build -t your-registry/lifeos-worker:latest ./worker
-
-# Push to registry
-docker push your-registry/lifeos-backend:latest
-docker push your-registry/lifeos-frontend:latest
-docker push your-registry/lifeos-worker:latest
-```
-
-### Step 5: Update Deployment Images
-
-Edit deployment files to use your registry:
-
-```yaml
-# backend-deployment.yaml, frontend-deployment.yaml, worker-deployment.yaml
-spec:
-  template:
-    spec:
-      containers:
-      - name: backend
-        image: your-registry/lifeos-backend:latest
-```
-
-### Step 6: Deploy
-
-```bash
-# Create namespace
 kubectl apply -f namespace.yaml
+```
 
-# Create ConfigMap and Secrets
-kubectl apply -f configmap.yaml
+### 2. Configure Secrets
+
+**Important:** Update `secrets.yaml` with your actual credentials before applying!
+
+```bash
+# Edit secrets.yaml with real values
+vim secrets.yaml
+
+# Apply secrets
 kubectl apply -f secrets.yaml
+```
 
-# Deploy databases
-kubectl apply -f postgres-deployment.yaml
-kubectl apply -f redis-deployment.yaml
-kubectl apply -f neo4j-deployment.yaml
+**Better approach (using sealed-secrets):**
 
-# Wait for databases to be ready
-kubectl wait --for=condition=ready pod -l app=postgres -n lifeos --timeout=300s
-kubectl wait --for=condition=ready pod -l app=redis -n lifeos --timeout=300s
-kubectl wait --for=condition=ready pod -l app=neo4j -n lifeos --timeout=300s
+```bash
+# Install sealed-secrets controller
+helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
+helm install sealed-secrets sealed-secrets/sealed-secrets --namespace kube-system
 
-# Deploy applications
+# Create sealed secret
+kubeseal -f secrets.yaml -w sealed-secrets.yaml
+kubectl apply -f sealed-secrets.yaml
+```
+
+### 3. Apply ConfigMaps
+
+```bash
+kubectl apply -f configmap.yaml
+```
+
+### 4. Deploy Backend
+
+```bash
 kubectl apply -f backend-deployment.yaml
-kubectl apply -f frontend-deployment.yaml
-kubectl apply -f worker-deployment.yaml
+kubectl apply -f backend-service.yaml
+```
 
-# Deploy ingress
+### 5. Deploy Frontend
+
+```bash
+kubectl apply -f frontend-deployment.yaml
+kubectl apply -f frontend-service.yaml
+```
+
+### 6. Configure Ingress
+
+```bash
+# Install nginx-ingress-controller if not already installed
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm install nginx-ingress ingress-nginx/ingress-nginx \
+  --namespace ingress-nginx \
+  --create-namespace
+
+# Install cert-manager for TLS
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
+
+# Apply ingress
 kubectl apply -f ingress.yaml
 ```
 
-## Verification
-
-### Check All Resources
+### 7. Enable Autoscaling
 
 ```bash
-kubectl get all -n lifeos
+# Install metrics-server if not already installed
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+# Apply HPA
+kubectl apply -f hpa.yaml
 ```
 
-Expected output:
-- 1 PostgreSQL pod
-- 1 Redis pod
-- 1 Neo4j pod
-- 3 Backend pods
-- 2 Frontend pods
-- 2 Worker pods
-
-### Check Pod Status
+### 8. Apply Network Policies (Optional but Recommended)
 
 ```bash
+kubectl apply -f network-policy.yaml
+```
+
+## Verify Deployment
+
+```bash
+# Check pods
 kubectl get pods -n lifeos
-```
 
-All pods should be in `Running` state with `READY 1/1`.
-
-### Check Services
-
-```bash
+# Check services
 kubectl get svc -n lifeos
-```
 
-Services should include:
-- postgres-service (ClusterIP)
-- redis-service (ClusterIP)
-- neo4j-service (ClusterIP)
-- backend-service (ClusterIP)
-- frontend-service (LoadBalancer)
-
-### Check Ingress
-
-```bash
+# Check ingress
 kubectl get ingress -n lifeos
+
+# Check HPA
+kubectl get hpa -n lifeos
+
+# View logs
+kubectl logs -f deployment/lifeos-backend -n lifeos
+kubectl logs -f deployment/lifeos-frontend -n lifeos
 ```
 
-Should show your domain and the IP address.
+## Health Checks
 
-### View Logs
-
+### Backend Health
 ```bash
-# Backend logs
-kubectl logs -f deployment/backend -n lifeos
+kubectl port-forward svc/lifeos-backend 8000:8000 -n lifeos
+curl http://localhost:8000/health
+```
 
-# Frontend logs
-kubectl logs -f deployment/frontend -n lifeos
-
-# Worker logs
-kubectl logs -f deployment/worker -n lifeos
-
-# Database logs
-kubectl logs -f deployment/postgres -n lifeos
-kubectl logs -f deployment/neo4j -n lifeos
-kubectl logs -f deployment/redis -n lifeos
+### Frontend Health
+```bash
+kubectl port-forward svc/lifeos-frontend 3000:3000 -n lifeos
+curl http://localhost:3000
 ```
 
 ## Scaling
 
-### Scale Backend
+### Manual Scaling
 
 ```bash
-kubectl scale deployment/backend --replicas=5 -n lifeos
+# Scale backend
+kubectl scale deployment/lifeos-backend --replicas=5 -n lifeos
+
+# Scale frontend
+kubectl scale deployment/lifeos-frontend --replicas=3 -n lifeos
 ```
 
-### Scale Frontend
+### Autoscaling Guidelines
 
-```bash
-kubectl scale deployment/frontend --replicas=3 -n lifeos
-```
+The HPA configuration will automatically scale based on:
+- CPU utilization (target: 70%)
+- Memory utilization (target: 80%)
+- Custom metrics (requests per second)
 
-### Scale Worker
+**Scale-up behavior:**
+- Adds up to 100% more pods every 30 seconds
+- Or adds 4 pods every 30 seconds (whichever is higher)
 
-```bash
-kubectl scale deployment/worker --replicas=4 -n lifeos
-```
+**Scale-down behavior:**
+- Removes up to 50% of pods every 60 seconds
+- Or removes 2 pods every 60 seconds (whichever is lower)
+- Waits 5 minutes before scaling down for stability
 
-### Auto-scaling (HPA)
-
-```bash
-# Enable metrics-server first
-kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-
-# Create HPA for backend
-kubectl autoscale deployment backend \
-  --cpu-percent=70 \
-  --min=3 \
-  --max=10 \
-  -n lifeos
-
-# Create HPA for frontend
-kubectl autoscale deployment frontend \
-  --cpu-percent=70 \
-  --min=2 \
-  --max=8 \
-  -n lifeos
-
-# Check HPA status
-kubectl get hpa -n lifeos
-```
-
-## Updates and Rollouts
-
-### Rolling Update
+## Rolling Updates
 
 ```bash
 # Update backend image
-kubectl set image deployment/backend \
-  backend=your-registry/lifeos-backend:v2.0.0 \
+kubectl set image deployment/lifeos-backend \
+  backend=registry.lifeos.io/backend:v1.2.0 \
   -n lifeos
 
-# Watch rollout
-kubectl rollout status deployment/backend -n lifeos
-```
+# Watch rollout status
+kubectl rollout status deployment/lifeos-backend -n lifeos
 
-### Rollback
-
-```bash
-# Check rollout history
-kubectl rollout history deployment/backend -n lifeos
-
-# Rollback to previous version
-kubectl rollout undo deployment/backend -n lifeos
-
-# Rollback to specific revision
-kubectl rollout undo deployment/backend --to-revision=2 -n lifeos
-```
-
-### Restart Deployment
-
-```bash
-kubectl rollout restart deployment/backend -n lifeos
-kubectl rollout restart deployment/frontend -n lifeos
-kubectl rollout restart deployment/worker -n lifeos
-```
-
-## Database Management
-
-### PostgreSQL
-
-```bash
-# Connect to PostgreSQL
-kubectl exec -it deployment/postgres -n lifeos -- psql -U postgres -d lifeos
-
-# Backup database
-kubectl exec deployment/postgres -n lifeos -- \
-  pg_dump -U postgres lifeos > backup.sql
-
-# Restore database
-cat backup.sql | kubectl exec -i deployment/postgres -n lifeos -- \
-  psql -U postgres lifeos
-```
-
-### Neo4j
-
-```bash
-# Access Neo4j browser
-kubectl port-forward service/neo4j-service 7474:7474 -n lifeos
-# Open http://localhost:7474
-
-# Connect to Neo4j shell
-kubectl exec -it deployment/neo4j -n lifeos -- \
-  cypher-shell -u neo4j -p password
-```
-
-### Redis
-
-```bash
-# Connect to Redis CLI
-kubectl exec -it deployment/redis -n lifeos -- redis-cli
-
-# Monitor Redis
-kubectl exec -it deployment/redis -n lifeos -- redis-cli MONITOR
-```
-
-## Monitoring
-
-### Resource Usage
-
-```bash
-# Pod resource usage
-kubectl top pods -n lifeos
-
-# Node resource usage
-kubectl top nodes
-```
-
-### Events
-
-```bash
-# Watch events
-kubectl get events -n lifeos --sort-by='.lastTimestamp'
-
-# Watch events in real-time
-kubectl get events -n lifeos -w
-```
-
-### Describe Resources
-
-```bash
-# Describe pod
-kubectl describe pod <pod-name> -n lifeos
-
-# Describe deployment
-kubectl describe deployment backend -n lifeos
-
-# Describe service
-kubectl describe service backend-service -n lifeos
+# Rollback if needed
+kubectl rollout undo deployment/lifeos-backend -n lifeos
 ```
 
 ## Troubleshooting
@@ -345,155 +175,135 @@ kubectl describe service backend-service -n lifeos
 ### Pod Not Starting
 
 ```bash
-# Check pod status
+# Describe pod
 kubectl describe pod <pod-name> -n lifeos
 
+# Check events
+kubectl get events -n lifeos --sort-by='.lastTimestamp'
+
 # Check logs
-kubectl logs <pod-name> -n lifeos
-
-# Check previous logs if crashed
-kubectl logs <pod-name> --previous -n lifeos
-```
-
-### Service Not Accessible
-
-```bash
-# Test service from within cluster
-kubectl run -it --rm debug --image=alpine --restart=Never -n lifeos -- sh
-# Inside the pod:
-apk add curl
-curl http://backend-service:8000/health
+kubectl logs <pod-name> -n lifeos --previous
 ```
 
 ### Database Connection Issues
 
 ```bash
-# Check if database is running
-kubectl get pods -n lifeos | grep postgres
+# Test PostgreSQL connection from pod
+kubectl exec -it <backend-pod> -n lifeos -- \
+  psql -h postgresql.lifeos.svc.cluster.local -U lifeos_user -d lifeos
 
-# Check database logs
-kubectl logs deployment/postgres -n lifeos
-
-# Test connection
-kubectl exec -it deployment/backend -n lifeos -- sh
-# Inside the pod:
-nc -zv postgres-service 5432
+# Test Redis connection
+kubectl exec -it <backend-pod> -n lifeos -- \
+  redis-cli -h redis.lifeos.svc.cluster.local ping
 ```
 
-### Ingress Not Working
+### High Memory/CPU Usage
 
 ```bash
-# Check ingress controller
-kubectl get pods -n ingress-nginx
+# Check resource usage
+kubectl top pods -n lifeos
+kubectl top nodes
 
-# Check ingress resource
-kubectl describe ingress lifeos-ingress -n lifeos
+# Increase resources if needed
+kubectl edit deployment/lifeos-backend -n lifeos
+# Update resources.limits and resources.requests
+```
 
-# Check ingress logs
-kubectl logs -n ingress-nginx deployment/ingress-nginx-controller
+## Monitoring
+
+### Prometheus & Grafana (Recommended)
+
+```bash
+# Install Prometheus Operator
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm install prometheus prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --create-namespace
+
+# Access Grafana
+kubectl port-forward svc/prometheus-grafana 3000:80 -n monitoring
+# Visit http://localhost:3000 (admin/prom-operator)
 ```
 
 ## Security Best Practices
 
-1. **Use Secrets for Sensitive Data**
-   - Never hardcode credentials
-   - Use Kubernetes Secrets or external secret managers
+1. **Use sealed-secrets or external secret management**
+   - AWS Secrets Manager
+   - HashiCorp Vault
+   - Azure Key Vault
 
-2. **Network Policies**
-   - Implement network policies to restrict pod-to-pod communication
-   - Only allow necessary connections
+2. **Enable Pod Security Policies**
+   ```bash
+   kubectl apply -f pod-security-policy.yaml
+   ```
 
-3. **RBAC**
-   - Use Role-Based Access Control
-   - Limit service account permissions
+3. **Regular Security Scans**
+   ```bash
+   # Scan images with Trivy
+   trivy image registry.lifeos.io/backend:latest
+   ```
 
-4. **Pod Security**
-   - Run containers as non-root
-   - Use security contexts
-   - Enable read-only root filesystem where possible
+4. **Network Policies**
+   - Already configured in `network-policy.yaml`
+   - Restricts pod-to-pod communication
 
-5. **Image Security**
-   - Use official base images
-   - Scan images for vulnerabilities
-   - Use specific image tags (not `latest`)
+5. **Resource Quotas**
+   ```yaml
+   apiVersion: v1
+   kind: ResourceQuota
+   metadata:
+     name: lifeos-quota
+     namespace: lifeos
+   spec:
+     hard:
+       requests.cpu: "10"
+       requests.memory: 20Gi
+       limits.cpu: "20"
+       limits.memory: 40Gi
+   ```
 
-## Backup and Disaster Recovery
+## Backup & Disaster Recovery
 
-### Database Backups
+### Backup ConfigMaps and Secrets
 
 ```bash
-# Create backup script
-cat > backup.sh << 'EOF'
-#!/bin/bash
-DATE=$(date +%Y%m%d_%H%M%S)
-
-# Backup PostgreSQL
-kubectl exec deployment/postgres -n lifeos -- \
-  pg_dump -U postgres lifeos > "postgres_backup_${DATE}.sql"
-
-# Backup Neo4j
-kubectl exec deployment/neo4j -n lifeos -- \
-  neo4j-admin dump --to=/tmp/neo4j_backup_${DATE}.dump
-kubectl cp lifeos/neo4j-pod:/tmp/neo4j_backup_${DATE}.dump \
-  "./neo4j_backup_${DATE}.dump"
-
-echo "Backup completed: ${DATE}"
-EOF
-
-chmod +x backup.sh
+kubectl get configmap -n lifeos -o yaml > backup-configmap.yaml
+kubectl get secret -n lifeos -o yaml > backup-secrets.yaml
 ```
 
-### Persistent Volume Backups
+### Backup Persistent Volumes
 
 ```bash
-# List PVCs
-kubectl get pvc -n lifeos
-
 # Use Velero for cluster backups
+helm repo add vmware-tanzu https://vmware-tanzu.github.io/helm-charts
+helm install velero vmware-tanzu/velero \
+  --namespace velero \
+  --create-namespace \
+  --set configuration.provider=aws \
+  --set configuration.backupStorageLocation.bucket=lifeos-backups
+
+# Create backup
 velero backup create lifeos-backup --include-namespaces lifeos
-```
-
-## Cleanup
-
-### Delete All Resources
-
-```bash
-# Delete entire namespace (careful!)
-kubectl delete namespace lifeos
-```
-
-### Delete Specific Resources
-
-```bash
-# Delete deployments only
-kubectl delete deployment --all -n lifeos
-
-# Delete services only
-kubectl delete service --all -n lifeos
-
-# Keep databases, delete applications
-kubectl delete deployment backend frontend worker -n lifeos
 ```
 
 ## Production Checklist
 
-- [ ] Secrets updated with production credentials
-- [ ] Domain name configured in Ingress
-- [ ] TLS certificates configured
-- [ ] Resource limits and requests set appropriately
-- [ ] Health checks configured
+- [ ] Secrets properly configured (not using default values)
+- [ ] TLS certificates configured and valid
+- [ ] Resource limits set appropriately
+- [ ] HPA configured and tested
 - [ ] Monitoring and alerting set up
-- [ ] Backup strategy implemented
+- [ ] Backup strategy in place
+- [ ] Network policies applied
+- [ ] Pod security policies enabled
+- [ ] Liveness and readiness probes configured
+- [ ] Logging aggregation configured
+- [ ] CI/CD pipeline tested
 - [ ] Disaster recovery plan documented
-- [ ] Auto-scaling configured
-- [ ] Network policies implemented
-- [ ] RBAC configured
-- [ ] Load testing completed
-- [ ] Security scanning performed
 
-## Additional Resources
+## Support
 
-- [Kubernetes Documentation](https://kubernetes.io/docs/)
-- [kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
-- [Production Best Practices](https://kubernetes.io/docs/setup/best-practices/)
-- [Security Best Practices](https://kubernetes.io/docs/concepts/security/)
+For issues or questions:
+- GitHub: https://github.com/lifeos/platform/issues
+- Slack: #lifeos-ops
+- Email: ops@lifeos.io
