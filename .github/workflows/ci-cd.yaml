@@ -1,0 +1,454 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+      - develop
+
+env:
+  REGISTRY: ghcr.io
+  BACKEND_IMAGE: ghcr.io/${{ github.repository }}/backend
+  FRONTEND_IMAGE: ghcr.io/${{ github.repository }}/frontend
+
+jobs:
+  # ============================================================================
+  # Linting & Code Quality
+  # ============================================================================
+  lint:
+    name: Lint & Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'yarn'
+    
+    - name: Install dependencies (backend)
+      working-directory: ./backend
+      run: yarn install --frozen-lockfile
+    
+    - name: Install dependencies (frontend)
+      working-directory: ./frontend
+      run: yarn install --frozen-lockfile
+    
+    - name: Lint backend
+      working-directory: ./backend
+      run: yarn lint
+    
+    - name: Lint frontend
+      working-directory: ./frontend
+      run: yarn lint
+    
+    - name: TypeScript check (backend)
+      working-directory: ./backend
+      run: yarn tsc --noEmit
+    
+    - name: TypeScript check (frontend)
+      working-directory: ./frontend
+      run: yarn tsc --noEmit
+
+  # ============================================================================
+  # Backend Tests
+  # ============================================================================
+  test-backend:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: lifeos_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'yarn'
+    
+    - name: Install dependencies
+      working-directory: ./backend
+      run: yarn install --frozen-lockfile
+    
+    - name: Run unit tests
+      working-directory: ./backend
+      env:
+        NODE_ENV: test
+        DB_HOST: localhost
+        DB_PORT: 5432
+        DB_NAME: lifeos_test
+        DB_USER: postgres
+        DB_PASSWORD: postgres
+        REDIS_HOST: localhost
+        REDIS_PORT: 6379
+      run: yarn test --coverage
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./backend/coverage/lcov.info
+        flags: backend
+        name: backend-coverage
+
+  # ============================================================================
+  # Frontend Tests
+  # ============================================================================
+  test-frontend:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'yarn'
+    
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: yarn install --frozen-lockfile
+    
+    - name: Run tests
+      working-directory: ./frontend
+      run: yarn test --coverage
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./frontend/coverage/lcov.info
+        flags: frontend
+        name: frontend-coverage
+
+  # ============================================================================
+  # Security Scanning
+  # ============================================================================
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: [lint]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Run Trivy vulnerability scanner (Backend)
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './backend'
+        format: 'sarif'
+        output: 'trivy-backend-results.sarif'
+    
+    - name: Run Trivy vulnerability scanner (Frontend)
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './frontend'
+        format: 'sarif'
+        output: 'trivy-frontend-results.sarif'
+    
+    - name: Upload Trivy results to GitHub Security
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: '.'
+
+  # ============================================================================
+  # Build Docker Images
+  # ============================================================================
+  build:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend, security]
+    if: github.event_name == 'push'
+    
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Extract metadata (backend)
+      id: meta-backend
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.BACKEND_IMAGE }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha,prefix={{branch}}-
+    
+    - name: Build and push backend image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./backend
+        file: ./backend/Dockerfile
+        push: true
+        tags: ${{ steps.meta-backend.outputs.tags }}
+        labels: ${{ steps.meta-backend.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        build-args: |
+          NODE_ENV=production
+    
+    - name: Extract metadata (frontend)
+      id: meta-frontend
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.FRONTEND_IMAGE }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha,prefix={{branch}}-
+    
+    - name: Build and push frontend image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./frontend
+        file: ./frontend/Dockerfile
+        push: true
+        tags: ${{ steps.meta-frontend.outputs.tags }}
+        labels: ${{ steps.meta-frontend.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        build-args: |
+          NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_AUTH0_DOMAIN=${{ secrets.NEXT_PUBLIC_AUTH0_DOMAIN }}
+          NEXT_PUBLIC_AUTH0_CLIENT_ID=${{ secrets.NEXT_PUBLIC_AUTH0_CLIENT_ID }}
+          NEXT_PUBLIC_AUTH0_AUDIENCE=${{ secrets.NEXT_PUBLIC_AUTH0_AUDIENCE }}
+
+  # ============================================================================
+  # Deploy to Kubernetes (Production)
+  # ============================================================================
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    environment:
+      name: production
+      url: https://lifeos.io
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    
+    - name: Update kubeconfig
+      run: |
+        aws eks update-kubeconfig --name lifeos-production --region us-east-1
+    
+    - name: Create/Update secrets in Kubernetes
+      run: |
+        kubectl create secret generic lifeos-secrets \
+          --from-literal=DB_USER=${{ secrets.DB_USER }} \
+          --from-literal=DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+          --from-literal=NEO4J_USER=${{ secrets.NEO4J_USER }} \
+          --from-literal=NEO4J_PASSWORD=${{ secrets.NEO4J_PASSWORD }} \
+          --from-literal=PINECONE_API_KEY=${{ secrets.PINECONE_API_KEY }} \
+          --from-literal=AUTH0_DOMAIN=${{ secrets.AUTH0_DOMAIN }} \
+          --from-literal=AUTH0_CLIENT_ID=${{ secrets.AUTH0_CLIENT_ID }} \
+          --from-literal=AUTH0_CLIENT_SECRET=${{ secrets.AUTH0_CLIENT_SECRET }} \
+          --from-literal=AUTH0_SECRET=${{ secrets.AUTH0_SECRET }} \
+          --from-literal=SESSION_SECRET=${{ secrets.SESSION_SECRET }} \
+          --from-literal=WEBHOOK_SECRET=${{ secrets.WEBHOOK_SECRET }} \
+          --namespace lifeos \
+          --dry-run=client -o yaml | kubectl apply -f -
+    
+    - name: Update backend deployment image
+      run: |
+        kubectl set image deployment/lifeos-backend \
+          backend=${{ env.BACKEND_IMAGE }}:main \
+          --namespace lifeos
+    
+    - name: Update frontend deployment image
+      run: |
+        kubectl set image deployment/lifeos-frontend \
+          frontend=${{ env.FRONTEND_IMAGE }}:main \
+          --namespace lifeos
+    
+    - name: Wait for backend rollout
+      run: |
+        kubectl rollout status deployment/lifeos-backend \
+          --namespace lifeos \
+          --timeout=5m
+    
+    - name: Wait for frontend rollout
+      run: |
+        kubectl rollout status deployment/lifeos-frontend \
+          --namespace lifeos \
+          --timeout=5m
+    
+    - name: Verify deployment
+      run: |
+        kubectl get pods --namespace lifeos
+        kubectl get svc --namespace lifeos
+        kubectl get ingress --namespace lifeos
+    
+    - name: Run smoke tests
+      run: |
+        echo "Running smoke tests..."
+        curl -f https://api.lifeos.io/health || exit 1
+        curl -f https://lifeos.io || exit 1
+        echo "Smoke tests passed!"
+    
+    - name: Notify deployment success
+      if: success()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: custom
+        custom_payload: |
+          {
+            "text": "✅ Deployment to Production Successful",
+            "attachments": [{
+              "color": "good",
+              "fields": [{
+                "title": "Repository",
+                "value": "${{ github.repository }}",
+                "short": true
+              }, {
+                "title": "Commit",
+                "value": "${{ github.sha }}",
+                "short": true
+              }]
+            }]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    
+    - name: Notify deployment failure
+      if: failure()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: custom
+        custom_payload: |
+          {
+            "text": "❌ Deployment to Production Failed",
+            "attachments": [{
+              "color": "danger",
+              "fields": [{
+                "title": "Repository",
+                "value": "${{ github.repository }}",
+                "short": true
+              }, {
+                "title": "Commit",
+                "value": "${{ github.sha }}",
+                "short": true
+              }]
+            }]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # ============================================================================
+  # Deploy to Staging
+  # ============================================================================
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    
+    environment:
+      name: staging
+      url: https://staging.lifeos.io
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    
+    - name: Update kubeconfig
+      run: |
+        aws eks update-kubeconfig --name lifeos-staging --region us-east-1
+    
+    - name: Deploy to staging
+      run: |
+        kubectl set image deployment/lifeos-backend \
+          backend=${{ env.BACKEND_IMAGE }}:develop \
+          --namespace lifeos-staging
+        
+        kubectl set image deployment/lifeos-frontend \
+          frontend=${{ env.FRONTEND_IMAGE }}:develop \
+          --namespace lifeos-staging
+        
+        kubectl rollout status deployment/lifeos-backend --namespace lifeos-staging --timeout=5m
+        kubectl rollout status deployment/lifeos-frontend --namespace lifeos-staging --timeout=5m
