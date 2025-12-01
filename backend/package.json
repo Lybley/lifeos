@@ -41,6 +41,7 @@
     "neo4j-driver": "^5.14.0",
     "openai": "^6.9.1",
     "pg": "^8.11.3",
+    "uuid": "^13.0.0",
     "winston": "^3.11.0"
   },
   "devDependencies": {
@@ -50,6 +51,7 @@
     "@types/jest": "^29.5.11",
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.10.4",
+    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^6.13.2",
     "@typescript-eslint/parser": "^6.13.2",
     "eslint": "^8.55.0",
