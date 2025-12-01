@@ -4,13 +4,20 @@ metadata:
   name: lifeos-config
   namespace: lifeos
 data:
+  # Backend configuration
   NODE_ENV: "production"
-  POSTGRES_HOST: "postgres-service"
-  POSTGRES_PORT: "5432"
-  POSTGRES_DB: "lifeos"
-  NEO4J_URI: "bolt://neo4j-service:7687"
-  NEO4J_USER: "neo4j"
-  REDIS_HOST: "redis-service"
+  PORT: "8000"
+  LOG_LEVEL: "info"
+  
+  # Database hosts (internal service names)
+  DB_HOST: "postgresql.lifeos.svc.cluster.local"
+  DB_PORT: "5432"
+  DB_NAME: "lifeos"
+  
+  REDIS_HOST: "redis.lifeos.svc.cluster.local"
   REDIS_PORT: "6379"
-  BACKEND_PORT: "8000"
-  FRONTEND_PORT: "3000"
+  
+  NEO4J_URI: "bolt://neo4j.lifeos.svc.cluster.local:7687"
+  
+  # Frontend configuration
+  NEXT_PUBLIC_API_URL: "https://api.lifeos.io"

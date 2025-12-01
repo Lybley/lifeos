@@ -1,76 +1,129 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend
+  name: lifeos-frontend
   namespace: lifeos
+  labels:
+    app: lifeos-frontend
+    version: v1
 spec:
   replicas: 2
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
-      app: frontend
+      app: lifeos-frontend
   template:
     metadata:
       labels:
-        app: frontend
+        app: lifeos-frontend
+        version: v1
     spec:
+      # Security context
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      
+      serviceAccountName: lifeos-frontend
+      
       containers:
       - name: frontend
-        image: lifeos-frontend:latest
-        imagePullPolicy: IfNotPresent
+        image: registry.lifeos.io/lifeos-frontend:latest
+        imagePullPolicy: Always
+        
         ports:
-        - containerPort: 3000
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        
+        # Environment variables
+        envFrom:
+        - configMapRef:
+            name: lifeos-config
+        - secretRef:
+            name: lifeos-secrets
+        
         env:
-        - name: NEXT_PUBLIC_API_URL
-          value: "http://backend-service:8000"
-        - name: AUTH0_DOMAIN
-          valueFrom:
-            secretKeyRef:
-              name: lifeos-secrets
-              key: AUTH0_DOMAIN
-        - name: AUTH0_CLIENT_ID
-          valueFrom:
-            secretKeyRef:
-              name: lifeos-secrets
-              key: AUTH0_CLIENT_ID
-        - name: AUTH0_CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: lifeos-secrets
-              key: AUTH0_CLIENT_SECRET
-        - name: AUTH0_AUDIENCE
-          valueFrom:
-            secretKeyRef:
-              name: lifeos-secrets
-              key: AUTH0_AUDIENCE
+        - name: PORT
+          value: "3000"
+        - name: HOSTNAME
+          value: "0.0.0.0"
+        
+        # Resource limits
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+        
+        # Liveness probe
         livenessProbe:
           httpGet:
             path: /
-            port: 3000
+            port: http
           initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        # Readiness probe
         readinessProbe:
           httpGet:
             path: /
-            port: 3000
-          initialDelaySeconds: 10
+            port: http
+          initialDelaySeconds: 5
           periodSeconds: 5
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
+          timeoutSeconds: 3
+          failureThreshold: 3
+        
+        # Security context
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1001
+          capabilities:
+            drop:
+              - ALL
+        
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: nextjs-cache
+          mountPath: /app/.next/cache
+      
+      volumes:
+      - name: tmp
+        emptyDir:
+          sizeLimit: 50Mi
+      - name: nextjs-cache
+        emptyDir:
+          sizeLimit: 100Mi
+      
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - lifeos-frontend
+              topologyKey: topology.kubernetes.io/zone
 ---
 apiVersion: v1
-kind: Service
+kind: ServiceAccount
 metadata:
-  name: frontend-service
+  name: lifeos-frontend
   namespace: lifeos
-spec:
-  selector:
-    app: frontend
-  ports:
-  - port: 3000
-    targetPort: 3000
-  type: LoadBalancer
