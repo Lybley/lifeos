@@ -435,7 +435,7 @@ async function completeAction(
     WHERE id = $2
   `;
 
-  await postgresClient.query(query, [JSON.stringify(rollbackData), actionId]);
+  await postgresClient.query(query, [rollbackData ? JSON.stringify(rollbackData) : null, actionId]);
 }
 
 async function failAction(actionId: string, errorMessage: string): Promise<void> {
