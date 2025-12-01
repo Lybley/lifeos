@@ -70,10 +70,14 @@ const init = async () => {
     await postgresClient.query('SELECT NOW()');
     logger.info('PostgreSQL connected');
 
-    const session = neo4jDriver.session();
-    await session.run('RETURN 1');
-    await session.close();
-    logger.info('Neo4j connected');
+    try {
+      const session = neo4jDriver.session();
+      await session.run('RETURN 1');
+      await session.close();
+      logger.info('Neo4j connected');
+    } catch (neoError) {
+      logger.warn('Neo4j not available (optional):', neoError);
+    }
   } catch (error) {
     logger.error('Database initialization failed:', error);
     throw error;
