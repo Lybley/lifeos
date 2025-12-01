@@ -321,4 +321,228 @@ router.post('/consent', async (req: Request, res: Response) => {
   }
 });
 
+// ============================================================================
+// ENCRYPTION SETTINGS
+// ============================================================================
+
+/**
+ * GET /api/v1/privacy/encryption-settings
+ * Get user's encryption settings
+ */
+router.get('/encryption-settings', async (req: Request, res: Response) => {
+  try {
+    const userId = req.query.user_id as string;
+
+    if (!userId) {
+      return res.status(400).json({ error: 'user_id required' });
+    }
+
+    let settings = await privacyService.getUserSettings(userId);
+    
+    // Initialize if not exists
+    if (!settings) {
+      await privacyService.initializeUserEncryption(userId);
+      settings = await privacyService.getUserSettings(userId);
+    }
+
+    res.json({
+      success: true,
+      settings,
+    });
+  } catch (error) {
+    logger.error('Failed to get encryption settings:', error);
+    res.status(500).json({ error: 'Failed to get encryption settings' });
+  }
+});
+
+/**
+ * POST /api/v1/privacy/enable-zero-knowledge
+ * Enable zero-knowledge encryption
+ */
+router.post('/enable-zero-knowledge', async (req: Request, res: Response) => {
+  try {
+    const { user_id, master_key_encrypted } = req.body;
+
+    if (!user_id || !master_key_encrypted) {
+      return res.status(400).json({ error: 'user_id and master_key_encrypted required' });
+    }
+
+    await privacyService.enableZeroKnowledge(user_id, master_key_encrypted);
+
+    res.json({
+      success: true,
+      message: 'Zero-knowledge encryption enabled',
+    });
+  } catch (error) {
+    logger.error('Failed to enable zero-knowledge:', error);
+    res.status(500).json({ error: 'Failed to enable zero-knowledge encryption' });
+  }
+});
+
+/**
+ * POST /api/v1/privacy/enable-vault
+ * Enable vault feature
+ */
+router.post('/enable-vault', async (req: Request, res: Response) => {
+  try {
+    const { user_id, vault_key_encrypted } = req.body;
+
+    if (!user_id || !vault_key_encrypted) {
+      return res.status(400).json({ error: 'user_id and vault_key_encrypted required' });
+    }
+
+    await privacyService.enableVault(user_id, vault_key_encrypted);
+
+    res.json({
+      success: true,
+      message: 'Vault feature enabled',
+    });
+  } catch (error) {
+    logger.error('Failed to enable vault:', error);
+    res.status(500).json({ error: 'Failed to enable vault' });
+  }
+});
+
+// ============================================================================
+// VAULT OPERATIONS
+// ============================================================================
+
+/**
+ * POST /api/v1/privacy/vault/store
+ * Store encrypted vault node
+ */
+router.post('/vault/store', async (req: Request, res: Response) => {
+  try {
+    const { user_id, node_id, encrypted_content, metadata } = req.body;
+
+    if (!user_id || !node_id || !encrypted_content) {
+      return res.status(400).json({ error: 'user_id, node_id, and encrypted_content required' });
+    }
+
+    await privacyService.storeVaultNode(user_id, node_id, encrypted_content, metadata);
+
+    res.json({
+      success: true,
+      message: 'Vault node stored',
+      node_id,
+    });
+  } catch (error) {
+    logger.error('Failed to store vault node:', error);
+    res.status(500).json({ error: 'Failed to store vault node' });
+  }
+});
+
+/**
+ * GET /api/v1/privacy/vault/:node_id
+ * Retrieve encrypted vault node
+ */
+router.get('/vault/:node_id', async (req: Request, res: Response) => {
+  try {
+    const { node_id } = req.params;
+    const userId = req.query.user_id as string;
+
+    if (!userId) {
+      return res.status(400).json({ error: 'user_id required' });
+    }
+
+    const node = await privacyService.getVaultNode(userId, node_id);
+
+    if (!node) {
+      return res.status(404).json({ error: 'Vault node not found' });
+    }
+
+    res.json({
+      success: true,
+      node,
+    });
+  } catch (error) {
+    logger.error('Failed to get vault node:', error);
+    res.status(500).json({ error: 'Failed to get vault node' });
+  }
+});
+
+/**
+ * GET /api/v1/privacy/vault/list
+ * List all vault nodes for user
+ */
+router.get('/vault/list', async (req: Request, res: Response) => {
+  try {
+    const userId = req.query.user_id as string;
+
+    if (!userId) {
+      return res.status(400).json({ error: 'user_id required' });
+    }
+
+    const nodes = await privacyService.listVaultNodes(userId);
+
+    res.json({
+      success: true,
+      nodes,
+      total: nodes.length,
+    });
+  } catch (error) {
+    logger.error('Failed to list vault nodes:', error);
+    res.status(500).json({ error: 'Failed to list vault nodes' });
+  }
+});
+
+// ============================================================================
+// KEY MANAGEMENT
+// ============================================================================
+
+/**
+ * POST /api/v1/privacy/generate-recovery-codes
+ * Generate recovery codes for zero-knowledge encryption
+ */
+router.post('/generate-recovery-codes', async (req: Request, res: Response) => {
+  try {
+    const { user_id, master_key } = req.body;
+
+    if (!user_id || !master_key) {
+      return res.status(400).json({ error: 'user_id and master_key required' });
+    }
+
+    // Convert base64 to Buffer
+    const masterKeyBuffer = Buffer.from(master_key, 'base64');
+    const codes = await privacyService.generateRecoveryCodes(user_id, masterKeyBuffer);
+
+    res.json({
+      success: true,
+      recovery_codes: codes,
+      message: 'Store these codes in a safe place. They can only be used once.',
+    });
+  } catch (error) {
+    logger.error('Failed to generate recovery codes:', error);
+    res.status(500).json({ error: 'Failed to generate recovery codes' });
+  }
+});
+
+/**
+ * POST /api/v1/privacy/use-recovery-code
+ * Use recovery code to retrieve master key
+ */
+router.post('/use-recovery-code', async (req: Request, res: Response) => {
+  try {
+    const { user_id, recovery_code } = req.body;
+
+    if (!user_id || !recovery_code) {
+      return res.status(400).json({ error: 'user_id and recovery_code required' });
+    }
+
+    const masterKey = await privacyService.useRecoveryCode(user_id, recovery_code);
+
+    if (!masterKey) {
+      return res.status(400).json({ error: 'Invalid or already used recovery code' });
+    }
+
+    res.json({
+      success: true,
+      master_key: masterKey.toString('base64'),
+    });
+  } catch (error) {
+    logger.error('Failed to use recovery code:', error);
+    res.status(500).json({ error: 'Failed to use recovery code' });
+  }
+});
+
 export default router;
