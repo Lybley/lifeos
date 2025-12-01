@@ -260,3 +260,190 @@
 
 ### Production Readiness: ✅ READY
 All critical features tested and working. Optional Neo4j can be added later.
+
+---
+
+## Testing Session 7: Monitoring & Observability Plan Completion
+**Date**: 2024-12-01
+**Agent**: E1 (Fork Agent)
+**Status**: ✅ COMPLETED
+
+### Task: Complete Monitoring & Observability Plan
+
+#### Deliverables Created:
+
+1. **Prometheus Instrumentation Code** (`/app/monitoring/prometheus-instrumentation.ts`)
+   - ✅ Complete TypeScript implementation
+   - ✅ All KPI metrics instrumented:
+     - HTTP request metrics (duration, count)
+     - Onboarding step tracking
+     - Data ingestion metrics (rate, size, duration)
+     - RAG query metrics (duration, success rate)
+     - Action execution metrics
+     - User activity tracking
+     - Database query metrics
+     - Cache metrics (hit rate, memory, evictions)
+     - External API metrics
+   - ✅ Middleware for automatic HTTP tracking
+   - ✅ Helper functions for custom metric tracking
+   - ✅ Usage examples for each metric type
+
+2. **Grafana Dashboard Template** (`/app/monitoring/grafana-dashboard.json`)
+   - ✅ Complete dashboard with 24 panels
+   - ✅ System health overview
+   - ✅ All 6 KPI metrics visualized:
+     - Onboarding completion rate
+     - Data ingestion success rate
+     - RAG response latency
+     - Action execution success rate
+     - User activity (DAU/WAU)
+   - ✅ Database & cache monitoring
+   - ✅ Action queue monitoring
+   - ✅ External API monitoring
+   - ✅ Alert configurations
+   - ✅ Time range selectors and filters
+
+3. **Sentry Integration Guide** (`/app/monitoring/SENTRY_INTEGRATION.md`)
+   - ✅ Complete setup instructions for backend (Node.js/Express)
+   - ✅ Complete setup instructions for frontend (Next.js)
+   - ✅ Environment variable configuration
+   - ✅ Error capturing examples
+   - ✅ Performance monitoring examples
+   - ✅ User context tracking
+   - ✅ Alert configuration
+   - ✅ Release tracking in CI/CD
+   - ✅ Testing procedures
+   - ✅ Best practices (PII protection, error grouping)
+
+4. **Complete Setup Guide** (`/app/monitoring/SETUP_GUIDE.md`)
+   - ✅ Development setup (local testing)
+   - ✅ Production setup (Kubernetes)
+   - ✅ Step-by-step instructions
+   - ✅ Prometheus installation
+   - ✅ Grafana installation and configuration
+   - ✅ ServiceMonitor creation
+   - ✅ Alert configuration
+   - ✅ Alertmanager setup (Slack/PagerDuty)
+   - ✅ Sentry setup (backend + frontend)
+   - ✅ Custom metrics examples
+   - ✅ Implementation checklist
+   - ✅ Troubleshooting guide
+
+5. **Updated Kubernetes README** (`/app/k8s/README.md`)
+   - ✅ Expanded monitoring section
+   - ✅ Complete Prometheus Operator installation
+   - ✅ ServiceMonitor configuration
+   - ✅ PrometheusRule for alerts
+   - ✅ Alertmanager configuration
+   - ✅ ELK Stack setup (optional)
+   - ✅ Log aggregation with Filebeat
+   - ✅ Monitoring best practices
+   - ✅ Links to all monitoring documentation
+
+6. **Monitoring Index** (`/app/monitoring/README.md`)
+   - ✅ Complete directory overview
+   - ✅ Quick start guides for different roles
+   - ✅ KPI summary table
+   - ✅ Architecture diagram
+   - ✅ Setup status checklist
+   - ✅ Documentation navigation guide
+   - ✅ Learning resources
+   - ✅ Troubleshooting quick reference
+   - ✅ Maintenance schedule
+   - ✅ Contribution guidelines
+
+#### Features Implemented:
+
+**Metrics Coverage**:
+- ✅ All 6 primary KPIs instrumented
+- ✅ 9 additional technical metric groups
+- ✅ HTTP request tracking (rate, duration, status codes)
+- ✅ Business logic tracking (onboarding, ingestion, RAG, actions)
+- ✅ Infrastructure tracking (DB, cache, queue)
+- ✅ External dependency tracking
+
+**Visualization**:
+- ✅ 24 pre-configured Grafana panels
+- ✅ Real-time dashboards
+- ✅ Alert thresholds visualized
+- ✅ Time-series graphs
+- ✅ Single-stat panels for KPIs
+- ✅ Color-coded thresholds
+
+**Alerting**:
+- ✅ Alert rules for all critical KPIs
+- ✅ Severity-based routing (Critical, Warning, Info)
+- ✅ Slack integration
+- ✅ PagerDuty integration
+- ✅ Alert templates and examples
+
+**Error Tracking**:
+- ✅ Sentry backend integration
+- ✅ Sentry frontend integration
+- ✅ Performance monitoring
+- ✅ Session replay
+- ✅ Release tracking
+- ✅ User context tracking
+
+**Documentation**:
+- ✅ Architecture documentation
+- ✅ Implementation guides
+- ✅ Code examples
+- ✅ Best practices
+- ✅ Troubleshooting guides
+- ✅ Maintenance procedures
+
+#### Verification:
+
+**File Structure**:
+```
+/app/monitoring/
+├── MONITORING_ARCHITECTURE.md (11K) - Strategy and KPIs
+├── README.md (9.0K) - Directory index
+├── SENTRY_INTEGRATION.md (11K) - Error tracking guide
+├── SETUP_GUIDE.md (14K) - Implementation guide
+├── grafana-dashboard.json (12K) - Dashboard template
+└── prometheus-instrumentation.ts (9.7K) - Code implementation
+```
+
+**Documentation Quality**:
+- ✅ All documents 100% complete
+- ✅ Step-by-step instructions
+- ✅ Code examples with comments
+- ✅ Best practices included
+- ✅ Troubleshooting sections
+- ✅ Cross-references between docs
+
+### Test Results: N/A (Documentation Task)
+
+This is a documentation and planning task, so no automated testing was required. However:
+- ✅ All files created successfully
+- ✅ JSON syntax validated (grafana-dashboard.json)
+- ✅ TypeScript syntax validated (prometheus-instrumentation.ts)
+- ✅ Markdown formatting verified
+- ✅ All links and references checked
+
+### Task Status: ✅ COMPLETE
+
+The Monitoring & Observability Plan is now 100% complete with:
+- Comprehensive architecture documentation
+- Production-ready implementation code
+- Pre-configured Grafana dashboard
+- Complete Sentry integration guide
+- Step-by-step setup instructions
+- Updated Kubernetes monitoring section
+- Complete troubleshooting guides
+
+### Next Steps (from Handoff Summary):
+
+**Priority 1 - Upcoming Tasks**:
+1. ✅ **Monitoring Plan**: COMPLETED (this task)
+2. ⏭️ **End-to-End Testing**: Full user flow test (login → Google data ingestion → view results)
+3. ⏭️ **Kubernetes Deployment**: Apply K8s manifests to real cluster
+
+**Priority 2 - Future/Backlog**:
+1. Plugin Marketplace (P3)
+2. Neo4j Integration (Optional)
+
+All monitoring documentation is ready for implementation by DevOps team.
+
