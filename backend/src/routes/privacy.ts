@@ -431,6 +431,32 @@ router.post('/vault/store', async (req: Request, res: Response) => {
 });
 
 /**
+ * GET /api/v1/privacy/vault/list
+ * List all vault nodes for user
+ * IMPORTANT: This must come BEFORE /vault/:node_id to avoid route conflicts
+ */
+router.get('/vault/list', async (req: Request, res: Response) => {
+  try {
+    const userId = req.query.user_id as string;
+
+    if (!userId) {
+      return res.status(400).json({ error: 'user_id required' });
+    }
+
+    const nodes = await privacyService.listVaultNodes(userId);
+
+    res.json({
+      success: true,
+      nodes,
+      total: nodes.length,
+    });
+  } catch (error) {
+    logger.error('Failed to list vault nodes:', error);
+    res.status(500).json({ error: 'Failed to list vault nodes' });
+  }
+});
+
+/**
  * GET /api/v1/privacy/vault/:node_id
  * Retrieve encrypted vault node
  */
@@ -456,31 +482,6 @@ router.get('/vault/:node_id', async (req: Request, res: Response) => {
   } catch (error) {
     logger.error('Failed to get vault node:', error);
     res.status(500).json({ error: 'Failed to get vault node' });
-  }
-});
-
-/**
- * GET /api/v1/privacy/vault/list
- * List all vault nodes for user
- */
-router.get('/vault/list', async (req: Request, res: Response) => {
-  try {
-    const userId = req.query.user_id as string;
-
-    if (!userId) {
-      return res.status(400).json({ error: 'user_id required' });
-    }
-
-    const nodes = await privacyService.listVaultNodes(userId);
-
-    res.json({
-      success: true,
-      nodes,
-      total: nodes.length,
-    });
-  } catch (error) {
-    logger.error('Failed to list vault nodes:', error);
-    res.status(500).json({ error: 'Failed to list vault nodes' });
   }
 });
 
