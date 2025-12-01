@@ -46,3 +46,7 @@ Thumbs.db
 .cache/
 *.tsbuildinfo
 .eslintcache
+-e 
+# Environment files
+*.env
+*.env.*
