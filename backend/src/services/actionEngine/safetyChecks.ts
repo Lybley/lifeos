@@ -154,7 +154,8 @@ async function checkRateLimit(
       await queueConnection.expire(redisKey, windowSeconds);
     }
     
-    logger.info(`Rate limit check: ${key} = ${current}/${limit}`);\n    
+    logger.info(`Rate limit check: ${key} = ${current}/${limit}`);
+    
     return current <= limit;
   } catch (error) {
     logger.error('Rate limit check failed:', error);
