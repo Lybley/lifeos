@@ -126,7 +126,7 @@ class LifeOSTestSuite:
             data = response.json()
             if data.get('success') and 'settings' in data:
                 settings = data['settings']
-                expected_fields = ['user_id', 'encryption_tier', 'vault_enabled', 'kms_key_id']
+                expected_fields = ['userId', 'encryptionTier', 'vaultEnabled', 'kmsKeyId']
                 
                 missing_fields = [field for field in expected_fields if field not in settings]
                 if missing_fields:
