@@ -412,8 +412,8 @@ async function getAction(actionId: string): Promise<Action | null> {
 async function updateActionStatus(actionId: string, status: ActionStatus): Promise<void> {
   const query = `
     UPDATE actions
-    SET status = $1,
-        started_at = CASE WHEN $1 = 'executing' THEN NOW() ELSE started_at END,
+    SET status = $1::VARCHAR,
+        started_at = CASE WHEN $1::VARCHAR = 'executing' THEN NOW() ELSE started_at END,
         updated_at = NOW()
     WHERE id = $2
   `;
