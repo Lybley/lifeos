@@ -4,6 +4,7 @@ import React from 'react';
 import { Bell, Search, User, Moon, Sun } from 'lucide-react';
 import { Input } from '../ui/Input';
 import { useState } from 'react';
+import LoginButton from '../auth/LoginButton';
 
 interface HeaderProps {
   title?: string;
@@ -46,11 +47,7 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
           </button>
 
-          <button className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-            <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
-              <User className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-            </div>
-          </button>
+          <LoginButton />
         </div>
       </div>
     </header>
