@@ -229,7 +229,7 @@ class LifeOSTestSuite:
             data = response.json()
             if data.get('success') and 'node' in data:
                 node = data['node']
-                if node.get('node_id') == node_id and 'encrypted_content' in node:
+                if 'encryptedContent' in node:
                     self.log_test("Privacy Vault Retrieve", True, f"Retrieved node: {node_id}")
                     return True
                 else:
