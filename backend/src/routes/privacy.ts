@@ -6,10 +6,7 @@
 import { Router, Request, Response } from 'express';
 import { postgresClient } from '../config/postgres';
 import logger from '../utils/logger';
-import archiver from 'archiver';
-import { createWriteStream } from 'fs';
-import { join } from 'path';
-import { unlink } from 'fs/promises';
+import { privacyService } from '../services/encryption/privacyService';
 
 const router = Router();
 
