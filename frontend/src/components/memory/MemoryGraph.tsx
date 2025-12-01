@@ -172,11 +172,12 @@ export const MemoryGraph: React.FC<MemoryGraphProps> = ({
 
       {/* Graph */}
       <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-        <ForceGraph2D
-          ref={graphRef}
-          graphData={filteredData}
-          nodeLabel="label"
-          nodeAutoColorBy="type"
+        {typeof window !== 'undefined' && (
+          <ForceGraph2D
+            ref={graphRef}
+            graphData={filteredData}
+            nodeLabel="label"
+            nodeAutoColorBy="type"
           nodeCanvasObject={(node: any, ctx, globalScale) => {
             const label = node.label;
             const fontSize = 12 / globalScale;
