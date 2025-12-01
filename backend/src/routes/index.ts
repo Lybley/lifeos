@@ -30,6 +30,7 @@ router.get('/', (req, res) => {
       rag: '/api/v1/rag',
       tasks: '/api/v1/tasks',
       agents: '/api/v1/agents',
+      actions: '/api/actions',
     },
   });
 });
