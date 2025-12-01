@@ -5,6 +5,7 @@ import jobsRouter from './jobs';
 import ragRouter from './rag';
 import taskExtractorRouter from './taskExtractor';
 import agentsRouter from './agents';
+import actionsRouter from './actions';
 
 const router = Router();
 
@@ -15,6 +16,7 @@ router.use('/jobs', jobsRouter);
 router.use('/v1/rag', ragRouter);
 router.use('/v1/tasks', taskExtractorRouter);
 router.use('/v1/agents', agentsRouter);
+router.use('/actions', actionsRouter);
 
 // API info
 router.get('/', (req, res) => {
