@@ -218,11 +218,12 @@ export const MemoryGraph: React.FC<MemoryGraphProps> = ({
           linkDirectionalParticleWidth={2}
           onNodeClick={handleNodeClick}
           onNodeHover={handleNodeHover}
-          width={typeof window !== 'undefined' ? window.innerWidth - 100 : 800}
-          height={height}
-          cooldownTicks={100}
-          onEngineStop={() => graphRef.current?.zoomToFit(400)}
-        />
+            width={typeof window !== 'undefined' ? window.innerWidth - 100 : 800}
+            height={height}
+            cooldownTicks={100}
+            onEngineStop={() => graphRef.current?.zoomToFit(400)}
+          />
+        )}
       </div>
 
       {/* Legend */}
