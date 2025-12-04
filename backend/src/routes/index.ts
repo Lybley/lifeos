@@ -32,6 +32,7 @@ router.use('/v1/ingestion', ingestionRouter);
 router.use('/v1/planner', plannerRouter);
 router.use('/v1/vault', vaultRouter);
 router.use('/v1/admin', adminRouter);
+router.use('/v1/billing', billingRouter);
 
 // API info
 router.get('/', (req, res) => {
