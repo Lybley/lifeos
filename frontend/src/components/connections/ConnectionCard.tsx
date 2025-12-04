@@ -61,7 +61,7 @@ export const ConnectionCard: React.FC<ConnectionCardProps> = ({
   };
 
   return (
-    <Card hover className="relative">
+    <Card hoverable className="relative">
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-2xl">

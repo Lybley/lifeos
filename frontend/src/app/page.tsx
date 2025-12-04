@@ -63,7 +63,7 @@ export default function DashboardPage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Link href="/memory">
-          <Card hover className="h-full">
+          <Card hoverable className="h-full">
             <CardContent className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Total Memories</p>
@@ -79,7 +79,7 @@ export default function DashboardPage() {
         </Link>
 
         <Link href="/connections">
-          <Card hover className="h-full">
+          <Card hoverable className="h-full">
             <CardContent className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Connections</p>
@@ -94,7 +94,7 @@ export default function DashboardPage() {
         </Link>
 
         <Link href="/chat">
-          <Card hover className="h-full">
+          <Card hoverable className="h-full">
             <CardContent className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Recent Chats</p>
@@ -109,7 +109,7 @@ export default function DashboardPage() {
         </Link>
 
         <Link href="/actions">
-          <Card hover className="h-full">
+          <Card hoverable className="h-full">
             <CardContent className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Actions Today</p>
