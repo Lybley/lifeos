@@ -614,6 +614,15 @@ class LifeOSTestSuite:
             self.test_action_get_by_id(action_id)
         self.test_action_get_by_user()
         
+        # Billing & Subscription API Tests
+        print("\n💳 Billing & Subscription API Tests")
+        print("-" * 40)
+        self.test_billing_plans()
+        self.test_billing_subscription()
+        self.test_billing_record_usage_embeddings()
+        self.test_billing_record_usage_llm_tokens()
+        self.test_billing_usage_summary()
+        
         # Summary
         print("\n" + "=" * 60)
         print("TEST SUMMARY")
