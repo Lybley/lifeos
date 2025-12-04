@@ -142,7 +142,7 @@ export default function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href="/actions">
+        <Link href="/actions" className="actions-link">
           <Card hoverable className="h-full">
             <CardContent className="flex items-center justify-between">
               <div>
