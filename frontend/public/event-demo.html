@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LifeOS Real-Time Events Demo</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+      margin-top: 0;
+      color: #333;
+    }
+    
+    .status {
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+    
+    .status.connected {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .status.disconnected {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .status.connecting {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+    }
+    
+    .controls {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    button:hover {
+      background: #0056b3;
+    }
+    
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .event-log {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      padding: 10px;
+      height: 400px;
+      overflow-y: auto;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 12px;
+    }
+    
+    .event-item {
+      padding: 8px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      border-left: 4px solid;
+    }
+    
+    .event-item.SYNC_UPDATE { border-color: #17a2b8; background: #e7f7f9; }
+    .event-item.TASK_CREATED { border-color: #28a745; background: #e7f5ea; }
+    .event-item.ACTION_STATUS { border-color: #ffc107; background: #fff8e1; }
+    .event-item.ALERT { border-color: #dc3545; background: #fce8eb; }
+    .event-item.PREDICTION_RISK { border-color: #fd7e14; background: #fff3e0; }
+    .event-item.AGENT_PROGRESS { border-color: #6f42c1; background: #f3e5f5; }
+    .event-item.system { border-color: #6c757d; background: #e9ecef; }
+    
+    .event-time {
+      color: #6c757d;
+      font-size: 11px;
+    }
+    
+    .event-type {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    
+    .event-data {
+      color: #495057;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .stat-card {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      border: 1px solid #dee2e6;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: #6c757d;
+      margin-bottom: 5px;
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔔 LifeOS Real-Time Events Demo</h1>
+    
+    <div id="status" class="status disconnected">
+      Status: Disconnected
+    </div>
+    
+    <div class="controls">
+      <button id="connectBtn" onclick="connect()">Connect</button>
+      <button id="disconnectBtn" onclick="disconnect()" disabled>Disconnect</button>
+      <button onclick="clearLog()">Clear Log</button>
+      <button onclick="simulateEvents()">Simulate Events</button>
+    </div>
+    
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Total Events</div>
+        <div class="stat-value" id="totalEvents">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Transport</div>
+        <div class="stat-value" id="transport">-</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Reconnect Attempts</div>
+        <div class="stat-value" id="reconnects">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Last Event</div>
+        <div class="stat-value" id="lastEvent" style="font-size: 14px;">-</div>
+      </div>
+    </div>
+    
+    <h3>Event Log</h3>
+    <div id="eventLog" class="event-log">
+      <div class="event-item system">
+        <div class="event-time">Waiting for connection...</div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="/event-client.js"></script>
+  <script>
+    let client = null;
+    let eventCount = 0;
+    let reconnectCount = 0;
+    
+    // Get token from URL or use demo token
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token') || 'demo-token-replace-with-real-jwt';
+    
+    function updateStatus(status, message) {
+      const statusEl = document.getElementById('status');
+      statusEl.className = `status ${status}`;
+      statusEl.textContent = `Status: ${message}`;
+    }
+    
+    function addEvent(type, data) {
+      eventCount++;
+      document.getElementById('totalEvents').textContent = eventCount;
+      document.getElementById('lastEvent').textContent = new Date().toLocaleTimeString();
+      
+      const log = document.getElementById('eventLog');
+      const eventDiv = document.createElement('div');
+      eventDiv.className = `event-item ${type || 'system'}`;
+      
+      const timeDiv = document.createElement('div');
+      timeDiv.className = 'event-time';
+      timeDiv.textContent = new Date().toLocaleTimeString();
+      
+      const typeDiv = document.createElement('div');
+      typeDiv.className = 'event-type';
+      typeDiv.textContent = type || 'SYSTEM';
+      
+      const dataDiv = document.createElement('div');
+      dataDiv.className = 'event-data';
+      dataDiv.textContent = JSON.stringify(data, null, 2);
+      
+      eventDiv.appendChild(timeDiv);
+      eventDiv.appendChild(typeDiv);
+      eventDiv.appendChild(dataDiv);
+      
+      log.insertBefore(eventDiv, log.firstChild);
+      
+      // Keep only last 50 events
+      while (log.children.length > 50) {
+        log.removeChild(log.lastChild);
+      }
+    }
+    
+    async function connect() {
+      if (client) {
+        console.log('Already connected');
+        return;
+      }
+      
+      updateStatus('connecting', 'Connecting...');
+      document.getElementById('connectBtn').disabled = true;
+      
+      client = new EventClient({
+        token: token,
+        maxReconnectAttempts: 10,
+        reconnectDelay: 1000,
+        maxReconnectDelay: 30000
+      });
+      
+      // Event handlers
+      client.on('connected', (data) => {
+        console.log('Connected:', data);
+        updateStatus('connected', `Connected (${data.transport})`);
+        document.getElementById('transport').textContent = data.transport;
+        document.getElementById('connectBtn').disabled = true;
+        document.getElementById('disconnectBtn').disabled = false;
+        addEvent('system', { message: 'Connected', transport: data.transport });
+      });
+      
+      client.on('disconnected', () => {
+        console.log('Disconnected');
+        updateStatus('disconnected', 'Disconnected');
+        document.getElementById('connectBtn').disabled = false;
+        document.getElementById('disconnectBtn').disabled = true;
+        addEvent('system', { message: 'Disconnected' });
+        reconnectCount++;
+        document.getElementById('reconnects').textContent = reconnectCount;
+      });
+      
+      client.on('error', (error) => {
+        console.error('Error:', error);
+        addEvent('system', { message: 'Error', error: error.toString() });
+      });
+      
+      // Event type handlers
+      client.on('SYNC_UPDATE', (data) => {
+        console.log('SYNC_UPDATE:', data);
+        addEvent('SYNC_UPDATE', data.data);
+      });
+      
+      client.on('TASK_CREATED', (data) => {
+        console.log('TASK_CREATED:', data);
+        addEvent('TASK_CREATED', data.data);
+      });
+      
+      client.on('ACTION_STATUS', (data) => {
+        console.log('ACTION_STATUS:', data);
+        addEvent('ACTION_STATUS', data.data);
+      });
+      
+      client.on('ALERT', (data) => {
+        console.log('ALERT:', data);
+        addEvent('ALERT', data.data);
+      });
+      
+      client.on('PREDICTION_RISK', (data) => {
+        console.log('PREDICTION_RISK:', data);
+        addEvent('PREDICTION_RISK', data.data);
+      });
+      
+      client.on('AGENT_PROGRESS', (data) => {
+        console.log('AGENT_PROGRESS:', data);
+        addEvent('AGENT_PROGRESS', data.data);
+      });
+      
+      // Connect
+      await client.connect();
+    }
+    
+    function disconnect() {
+      if (client) {
+        client.disconnect();
+        client = null;
+      }
+      updateStatus('disconnected', 'Disconnected');
+      document.getElementById('connectBtn').disabled = false;
+      document.getElementById('disconnectBtn').disabled = true;
+    }
+    
+    function clearLog() {
+      document.getElementById('eventLog').innerHTML = '';
+      eventCount = 0;
+      document.getElementById('totalEvents').textContent = '0';
+    }
+    
+    async function simulateEvents() {
+      if (!client || !client.isConnected()) {
+        alert('Please connect first');
+        return;
+      }
+      
+      alert('Simulate events by calling the backend API:\n\n' +
+            'POST /events/publish\n' +
+            '{\n' +
+            '  "eventType": "SYNC_UPDATE",\n' +
+            '  "userIds": ["your-user-id"],\n' +
+            '  "payload": { ... }\n' +
+            '}');
+    }
+    
+    // Auto-connect on load if token is provided
+    if (token && token !== 'demo-token-replace-with-real-jwt') {
+      connect();
+    }
+  </script>
+</body>
+</html>
