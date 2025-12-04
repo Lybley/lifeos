@@ -37,7 +37,7 @@ async def main():
     )
     
     # Create message bus
-    bus = AgentBus(redis_url=\"redis://localhost:6379\", db_pool=db_pool)
+    bus = AgentBus(redis_url="redis://localhost:6379", db_pool=db_pool)
     await bus.connect()
     
     # Create agents
