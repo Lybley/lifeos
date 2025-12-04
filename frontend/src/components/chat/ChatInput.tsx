@@ -105,7 +105,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           onClick={handleSubmit}
           disabled={loading || (!message.trim() && files.length === 0)}
           size="md"
-          icon={loading ? <Loader2 className="animate-spin" /> : <Send className="w-5 h-5" />}
+          rightIcon={loading ? <Loader2 className="animate-spin" /> : <Send className="w-5 h-5" />}
         >
           Send
         </Button>
