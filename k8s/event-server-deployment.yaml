@@ -1,0 +1,160 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lifeos-event-server
+  namespace: lifeos
+  labels:
+    app: lifeos-event-server
+    component: realtime
+spec:
+  replicas: 2  # Multiple instances for testing Redis Pub/Sub
+  selector:
+    matchLabels:
+      app: lifeos-event-server
+  template:
+    metadata:
+      labels:
+        app: lifeos-event-server
+        component: realtime
+    spec:
+      containers:
+      - name: event-server
+        image: lifeos/event-server:latest
+        ports:
+        - containerPort: 8001
+          name: http
+          protocol: TCP
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "8001"
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: lifeos-secrets
+              key: jwt-secret
+        - name: AUTH0_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: lifeos-secrets
+              key: auth0-client-secret
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lifeos-event-server
+  namespace: lifeos
+  labels:
+    app: lifeos-event-server
+spec:
+  selector:
+    app: lifeos-event-server
+  ports:
+  - port: 8001
+    targetPort: 8001
+    protocol: TCP
+    name: http
+  type: ClusterIP
+  sessionAffinity: ClientIP  # Important for WebSocket sticky sessions
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: lifeos
+spec:
+  selector:
+    app: redis
+  ports:
+  - port: 6379
+    targetPort: 6379
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: lifeos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+      volumes:
+      - name: redis-data
+        emptyDir: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: lifeos-event-ingress
+  namespace: lifeos
+  annotations:
+    nginx.ingress.kubernetes.io/websocket-services: "lifeos-event-server"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: lifeos.example.com
+    http:
+      paths:
+      - path: /events
+        pathType: Prefix
+        backend:
+          service:
+            name: lifeos-event-server
+            port:
+              number: 8001
