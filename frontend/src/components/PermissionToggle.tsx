@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Switch } from '@/components/ui/Switch';
 import { Label } from '@/components/ui/Label';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/Badge';
 import { AlertCircle, Shield, Info } from 'lucide-react';
 
 interface PermissionToggleProps {
