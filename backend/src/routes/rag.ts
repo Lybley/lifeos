@@ -7,6 +7,7 @@ import { Router, Request, Response } from 'express';
 import { body, query, validationResult } from 'express-validator';
 import { queryRAG, RAGQueryRequest } from '../services/rag/ragService';
 import { invalidateUserCache, getCacheStats, clearAllCache } from '../services/rag/cache';
+import { requirePermission, AuthenticatedRequest } from '../permissions/PermissionMiddleware';
 import logger from '../utils/logger';
 
 const router = Router();
