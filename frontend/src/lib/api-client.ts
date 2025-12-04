@@ -180,6 +180,30 @@ class ApiClient {
     const response = await this.client.get(`/jobs/${jobId}`);
     return response.data;
   }
+
+  // ==================== EVENTS ====================
+  
+  async getEvents(userId: string, options?: { limit?: number; offset?: number; eventType?: string }) {
+    const response = await this.client.get('/v1/events', {
+      params: {
+        user_id: userId,
+        limit: options?.limit || 50,
+        offset: options?.offset || 0,
+        event_type: options?.eventType,
+      },
+    });
+    return response.data;
+  }
+
+  async createEvent(data: {
+    user_id: string;
+    event_type: string;
+    event_time: string;
+    metadata?: any;
+  }) {
+    const response = await this.client.post('/v1/events', data);
+    return response.data;
+  }
 }
 
 export const apiClient = new ApiClient();
