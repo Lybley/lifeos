@@ -21,6 +21,8 @@ import {
   generateCacheKey,
   CachedRAGResponse,
 } from './cache';
+import { validateLLMResponse } from '../llm-response-validator';
+import { SYSTEM_PROMPT_TEMPLATE, Source as GuardrailSource, FALLBACK_RESPONSES } from '../../config/llm-guardrails';
 
 export interface RAGQueryRequest {
   user_id: string;
