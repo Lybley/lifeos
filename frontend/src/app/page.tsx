@@ -140,36 +140,43 @@ export default function DashboardPage() {
           </Card>
         </Link>
 
-        <Link href="/chat">
-          <Card hoverable className="h-full">
-            <CardContent className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Recent Chats</p>
-                <p className="text-3xl font-bold">{stats.recentChats}</p>
-                <Badge variant="default" size="sm" className="mt-2">
-                  This week
-                </Badge>
-              </div>
-              <MessageSquare className="w-12 h-12 text-blue-600 opacity-50" />
-            </CardContent>
-          </Card>
-        </Link>
-
         <Link href="/actions">
           <Card hoverable className="h-full">
             <CardContent className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Actions Today</p>
-                <p className="text-3xl font-bold">{stats.actionsToday}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Recent Actions</p>
+                <p className="text-3xl font-bold">{stats.recentActions}</p>
                 <Badge variant="warning" size="sm" className="mt-2">
-                  2 pending
+                  {stats.pendingActions} pending
                 </Badge>
               </div>
               <CheckCircle className="w-12 h-12 text-purple-600 opacity-50" />
             </CardContent>
           </Card>
         </Link>
+
+        <Link href="/admin">
+          <Card hoverable className="h-full">
+            <CardContent className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Recent Events</p>
+                <p className="text-3xl font-bold">{stats.recentEvents}</p>
+                <Badge variant="info" size="sm" className="mt-2">
+                  Live
+                </Badge>
+              </div>
+              <TrendingUp className="w-12 h-12 text-green-600 opacity-50" />
+            </CardContent>
+          </Card>
+        </Link>
       </div>
+
+      {/* Loading State */}
+      {loading && (
+        <div className="text-center py-8 text-gray-500">
+          Loading dashboard data...
+        </div>
+      )}
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
