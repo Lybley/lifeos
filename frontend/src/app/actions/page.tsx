@@ -180,7 +180,7 @@ export default function ActionsPage() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      icon={<RotateCcw className="w-4 h-4" />}
+                      leftIcon={<RotateCcw className="w-4 h-4" />}
                       onClick={() => handleRollback(action.id)}
                     >
                       Rollback
