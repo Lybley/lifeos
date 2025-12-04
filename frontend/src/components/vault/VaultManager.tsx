@@ -56,7 +56,7 @@ export const VaultManager: React.FC<VaultManagerProps> = ({
   };
 
   const handleLock = () => {
-    vaultClient.lockVault();
+    vaultClient.lock();
     setItems([]);
     onLock();
   };
