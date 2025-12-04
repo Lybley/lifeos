@@ -14,6 +14,7 @@ import {
 } from '../services/actionEngine/worker';
 import { getRateLimitUsage } from '../services/actionEngine/safetyChecks';
 import { ActionType } from '../services/actionEngine/types';
+import { requirePermission, AuthenticatedRequest } from '../permissions/PermissionMiddleware';
 import logger from '../utils/logger';
 import { postgresClient } from '../config/postgres';
 
