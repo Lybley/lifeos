@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { PermissionToggle } from './PermissionToggle';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/Button';
+import { Alert, AlertDescription } from '@/components/ui/Alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { AlertCircle, Shield, FileText, Calendar, Mail, Users } from 'lucide-react';
 
 interface Scope {
