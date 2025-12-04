@@ -62,11 +62,8 @@ export class OpenAILLMClient extends BaseLLMClient {
 
   constructor(config: LLMConfig) {
     super(config);
-    // Check if using Emergent LLM Key
-    const isEmergentKey = config.apiKey.startsWith('sk-emergent-');
     this.client = new OpenAI({
       apiKey: config.apiKey,
-      baseURL: isEmergentKey ? 'https://api.emergentmethods.ai/v1' : undefined,
     });
   }
 
