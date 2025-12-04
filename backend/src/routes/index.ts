@@ -10,6 +10,7 @@ import privacyRouter from './privacy';
 import permissionsRouter from './permissions';
 import eventsRouter from './events';
 import ingestionRouter from './ingestion';
+import plannerRouter from './planner';
 
 const router = Router();
 
