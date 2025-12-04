@@ -48,6 +48,7 @@ router.get('/', (req, res) => {
       events: '/api/v1/events',
       ingestion: '/api/v1/ingestion',
       planner: '/api/v1/planner',
+      vault: '/api/v1/vault',
     },
   });
 });
