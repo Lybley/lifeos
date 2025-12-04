@@ -46,7 +46,7 @@ export const ConnectionManager: React.FC<ConnectionManagerProps> = ({
           </p>
         </div>
         {onAddNew && (
-          <Button onClick={onAddNew} icon={<Plus className="w-4 h-4" />}>
+          <Button onClick={onAddNew} leftIcon={<Plus className="w-4 h-4" />}>
             Add Connection
           </Button>
         )}
