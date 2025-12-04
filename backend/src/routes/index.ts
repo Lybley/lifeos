@@ -45,6 +45,7 @@ router.get('/', (req, res) => {
       permissions: '/api/v1/permissions',
       events: '/api/v1/events',
       ingestion: '/api/v1/ingestion',
+      planner: '/api/v1/planner',
     },
   });
 });
