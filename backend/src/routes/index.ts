@@ -11,6 +11,7 @@ import permissionsRouter from './permissions';
 import eventsRouter from './events';
 import ingestionRouter from './ingestion';
 import plannerRouter from './planner';
+import vaultRouter from './vault';
 
 const router = Router();
 
