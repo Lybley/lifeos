@@ -9,6 +9,7 @@ import actionsRouter from './actions';
 import privacyRouter from './privacy';
 import permissionsRouter from './permissions';
 import eventsRouter from './events';
+import ingestionRouter from './ingestion';
 
 const router = Router();
 
@@ -23,6 +24,7 @@ router.use('/actions', actionsRouter);
 router.use('/v1/privacy', privacyRouter);
 router.use('/v1/permissions', permissionsRouter);
 router.use('/v1/events', eventsRouter);
+router.use('/v1/ingestion', ingestionRouter);
 
 // API info
 router.get('/', (req, res) => {
