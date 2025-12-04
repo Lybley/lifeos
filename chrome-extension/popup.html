@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LifeOS Browser Collector</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      width: 320px;
+      padding: 16px;
+      background: #f5f5f5;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    
+    .header h1 {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    
+    .header p {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .status-card {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .status-row:last-child {
+      border-bottom: none;
+    }
+    
+    .status-label {
+      font-size: 13px;
+      color: #666;
+    }
+    
+    .status-value {
+      font-size: 13px;
+      font-weight: 500;
+      color: #333;
+    }
+    
+    .status-value.success {
+      color: #4CAF50;
+    }
+    
+    .status-value.error {
+      color: #F44336;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 8px;
+    }
+    
+    button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .primary-btn {
+      background: #2196F3;
+      color: white;
+    }
+    
+    .primary-btn:hover {
+      background: #1976D2;
+    }
+    
+    .primary-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .secondary-btn {
+      background: #f0f0f0;
+      color: #333;
+    }
+    
+    .secondary-btn:hover {
+      background: #e0e0e0;
+    }
+    
+    .toggle-container {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .toggle-label {
+      font-size: 13px;
+      color: #333;
+      font-weight: 500;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .toggle-slider {
+      background-color: #2196F3;
+    }
+    
+    input:checked + .toggle-slider:before {
+      transform: translateX(20px);
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 12px;
+    }
+    
+    .footer a {
+      font-size: 11px;
+      color: #2196F3;
+      text-decoration: none;
+    }
+    
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 8px;
+      color: #666;
+      font-size: 12px;
+    }
+    
+    .loading.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>LifeOS Browser Collector</h1>
+    <p>Securely sync your browsing history</p>
+  </div>
+  
+  <div class="status-card">
+    <div class="status-row">
+      <span class="status-label">Status</span>
+      <span class="status-value" id="syncStatus">Checking...</span>
+    </div>
+    <div class="status-row">
+      <span class="status-label">Last Sync</span>
+      <span class="status-value" id="lastSync">Never</span>
+    </div>
+    <div class="status-row">
+      <span class="status-label">Items Synced</span>
+      <span class="status-value" id="itemCount">0</span>
+    </div>
+  </div>
+  
+  <div class="toggle-container">
+    <span class="toggle-label">Auto Sync</span>
+    <label class="toggle-switch">
+      <input type="checkbox" id="syncToggle" checked>
+      <span class="toggle-slider"></span>
+    </label>
+  </div>
+  
+  <div class="button-group">
+    <button class="primary-btn" id="syncNowBtn">Sync Now</button>
+    <button class="secondary-btn" id="optionsBtn">Settings</button>
+  </div>
+  
+  <div class="loading" id="loading">Syncing...</div>
+  
+  <div class="footer">
+    <a href="options.html" target="_blank">Advanced Settings</a>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
