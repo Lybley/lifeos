@@ -127,7 +127,7 @@ export async function encryptData(
   const ciphertext = await crypto.subtle.encrypt(
     {
       name: 'AES-GCM',
-      iv: iv,
+      iv: new Uint8Array(iv),
     },
     key,
     plaintext
