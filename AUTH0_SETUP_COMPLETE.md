@@ -40,19 +40,19 @@ Go to your [Auth0 Dashboard](https://manage.auth0.com/dashboard/us/dev-7uhqscqzu
 **Allowed Callback URLs:**
 ```
 http://localhost:3000/api/auth/callback
-https://lifeos-brain.preview.emergentagent.com/api/auth/callback
+https://memgraph.preview.emergentagent.com/api/auth/callback
 ```
 
 **Allowed Logout URLs:**
 ```
 http://localhost:3000
-https://lifeos-brain.preview.emergentagent.com
+https://memgraph.preview.emergentagent.com
 ```
 
 **Allowed Web Origins:**
 ```
 http://localhost:3000
-https://lifeos-brain.preview.emergentagent.com
+https://memgraph.preview.emergentagent.com
 ```
 
 ### Steps:
