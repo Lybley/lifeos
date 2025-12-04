@@ -73,7 +73,7 @@ export const ConnectGmailStep: React.FC<ConnectGmailStepProps> = ({
               <Button
                 onClick={handleConnect}
                 loading={connecting}
-                icon={<Mail className="w-4 h-4" />}
+                leftIcon={<Mail className="w-4 h-4" />}
               >
                 Connect Gmail
               </Button>
