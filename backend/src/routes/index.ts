@@ -13,6 +13,7 @@ import ingestionRouter from './ingestion';
 import plannerRouter from './planner';
 import vaultRouter from './vault';
 import adminRouter from './admin';
+import billingRouter from './billing';
 
 const router = Router();
 
