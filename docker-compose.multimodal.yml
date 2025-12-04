@@ -1,0 +1,234 @@
+version: '3.8'
+
+services:
+  # ============================================================================
+  # VOICE PROCESSING SERVICE
+  # ============================================================================
+  voice-processor:
+    build:
+      context: ./services/voice-processor
+      dockerfile: Dockerfile
+    container_name: lifeos-voice-processor
+    environment:
+      - NODE_ENV=production
+      - WHISPER_MODEL=base
+      - USE_OPENAI_WHISPER=true
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=lifeos
+      - POSTGRES_USER=lifeos_user
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./temp/voice:/tmp/voice-processing
+      - ./models/whisper:/models/whisper
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - lifeos-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+  
+  # ============================================================================
+  # IMAGE PROCESSING SERVICE
+  # ============================================================================
+  image-processor:
+    build:
+      context: ./services/image-processor
+      dockerfile: Dockerfile
+    container_name: lifeos-image-processor
+    environment:
+      - NODE_ENV=production
+      - VISION_PROVIDER=openai
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GOOGLE_CLOUD_API_KEY=${GOOGLE_CLOUD_API_KEY}
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=lifeos
+      - POSTGRES_USER=lifeos_user
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./temp/images:/tmp/image-processing
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - lifeos-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 3G
+        reservations:
+          cpus: '1'
+          memory: 1.5G
+  
+  # ============================================================================
+  # SCREENSHOT PROCESSING SERVICE
+  # ============================================================================
+  screenshot-processor:
+    build:
+      context: ./services/screenshot-processor
+      dockerfile: Dockerfile
+    container_name: lifeos-screenshot-processor
+    environment:
+      - NODE_ENV=production
+      - OCR_ENGINE=tesseract
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=lifeos
+      - POSTGRES_USER=lifeos_user
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./temp/screenshots:/tmp/screenshot-processing
+      - ./models/tesseract:/usr/share/tesseract-ocr/4.00/tessdata
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - lifeos-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 3G
+        reservations:
+          cpus: '1'
+          memory: 1.5G
+  
+  # ============================================================================
+  # BROWSER HISTORY PROCESSOR
+  # ============================================================================
+  browser-processor:
+    build:
+      context: ./services/browser-processor
+      dockerfile: Dockerfile
+    container_name: lifeos-browser-processor
+    environment:
+      - NODE_ENV=production
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=lifeos
+      - POSTGRES_USER=lifeos_user
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - lifeos-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+  
+  # ============================================================================
+  # REDIS (Job Queue)
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: lifeos-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - lifeos-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+  
+  # ============================================================================
+  # POSTGRES (Metadata Storage)
+  # ============================================================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: lifeos-postgres
+    environment:
+      - POSTGRES_DB=lifeos
+      - POSTGRES_USER=lifeos_user
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - lifeos-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lifeos_user"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+  
+  # ============================================================================
+  # API GATEWAY
+  # ============================================================================
+  api-gateway:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lifeos-api-gateway
+    environment:
+      - NODE_ENV=production
+      - PORT=8000
+      - REDIS_URL=redis://redis:6379
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=lifeos
+      - POSTGRES_USER=lifeos_user
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - VOICE_PROCESSOR_URL=http://voice-processor:3001
+      - IMAGE_PROCESSOR_URL=http://image-processor:3002
+      - SCREENSHOT_PROCESSOR_URL=http://screenshot-processor:3003
+      - BROWSER_PROCESSOR_URL=http://browser-processor:3004
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - postgres
+      - voice-processor
+      - image-processor
+      - screenshot-processor
+      - browser-processor
+    networks:
+      - lifeos-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  lifeos-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+    driver: local
+  postgres-data:
+    driver: local
