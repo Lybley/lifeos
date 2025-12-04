@@ -159,10 +159,10 @@ export async function decryptData(
   const plaintext = await crypto.subtle.decrypt(
     {
       name: 'AES-GCM',
-      iv: iv,
+      iv: new Uint8Array(iv),
     },
     key,
-    ciphertext
+    new Uint8Array(ciphertext)
   );
 
   // Deserialize
