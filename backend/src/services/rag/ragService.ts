@@ -207,7 +207,7 @@ export async function queryRAG(
       .filter(c => c !== null) as RAGQueryResponse['citations'];
 
     const response: RAGQueryResponse = {
-      answer: llmResponse.content,
+      answer: finalResponse,
       citations,
       used_chunks: vectorResults.length,
       confidence,
