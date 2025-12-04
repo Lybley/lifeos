@@ -40,19 +40,19 @@ Go to your [Auth0 Dashboard](https://manage.auth0.com/dashboard/us/dev-7uhqscqzu
 **Allowed Callback URLs:**
 ```
 http://localhost:3000/api/auth/callback
-https://mind-vault-6.preview.emergentagent.com/api/auth/callback
+https://mindvault-40.preview.emergentagent.com/api/auth/callback
 ```
 
 **Allowed Logout URLs:**
 ```
 http://localhost:3000
-https://mind-vault-6.preview.emergentagent.com
+https://mindvault-40.preview.emergentagent.com
 ```
 
 **Allowed Web Origins:**
 ```
 http://localhost:3000
-https://mind-vault-6.preview.emergentagent.com
+https://mindvault-40.preview.emergentagent.com
 ```
 
 ### Steps:
