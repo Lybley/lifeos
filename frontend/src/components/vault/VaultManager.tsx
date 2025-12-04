@@ -41,9 +41,13 @@ export const VaultManager: React.FC<VaultManagerProps> = ({
     setLoading(true);
     setError('');
     try {
-      await vaultClient.unlockVault(userId, { passphrase });
-      onUnlock();
-      setPassphrase('');
+      const result = await vaultClient.unlock(userId, { passphrase });
+      if (result.success) {
+        onUnlock();
+        setPassphrase('');
+      } else {
+        setError(result.message || 'Failed to unlock vault');
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to unlock vault');
     } finally {
