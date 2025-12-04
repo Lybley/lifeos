@@ -93,7 +93,7 @@ export async function deriveKeyFromPassphrase(
   const derivedKey = await crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt: salt,
+      salt: new Uint8Array(salt),
       iterations: iterations,
       hash: hashAlgorithm,
     },
