@@ -111,7 +111,7 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Link href="/memory">
+        <Link href="/memory" className="memory-graph-link">
           <Card hoverable className="h-full">
             <CardContent className="flex items-center justify-between">
               <div>
