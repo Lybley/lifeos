@@ -6,6 +6,10 @@ import morgan from 'morgan';
 import 'express-async-errors';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
+
+// Load environment variables FIRST before importing any config files
+dotenv.config();
+
 import { postgresClient } from './config/postgres';
 import { neo4jDriver } from './config/neo4j';
 import { pineconeClient } from './config/pinecone';
@@ -17,8 +21,6 @@ import { authMiddleware } from './middleware/auth';
 import apiRoutes from './routes';
 // Worker will be initialized conditionally
 let actionWorker: any = null;
-
-dotenv.config();
 
 const app: Application = express();
 const PORT = process.env.PORT || 8000;
