@@ -25,7 +25,7 @@ export const VaultManager: React.FC<VaultManagerProps> = ({
   onLock,
 }) => {
   const [passphrase, setPassphrase] = useState('');
-  const [items, setItems] = useState<VaultItem[]>([]);
+  const [items, setItems] = useState<Array<Omit<VaultItem, 'data'> & { data?: any }>>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
