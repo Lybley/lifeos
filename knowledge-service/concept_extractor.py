@@ -219,7 +219,7 @@ Output valid JSON only (no markdown, no explanations):
                     "definition": "A subset of AI that enables systems to learn from data",
                     "domain": "computer_science",
                     "alternative_names": ["ML", "Statistical Learning"],
-                    "properties": {"requires_data": true, "automated": true}
+                    "properties": {"requires_data": True, "automated": True}
                 }
             ],
             "relationships": [
