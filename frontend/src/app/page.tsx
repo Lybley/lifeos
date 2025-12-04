@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/Button';
 import { Brain, MessageSquare, Upload, Link as LinkIcon, TrendingUp, Clock, CheckCircle } from 'lucide-react';
 import apiClient from '@/lib/api-client';
 import Link from 'next/link';
+import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist';
+import { TooltipManager } from '@/components/onboarding/TooltipManager';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState({
