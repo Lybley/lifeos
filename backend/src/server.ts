@@ -27,6 +27,10 @@ const app: Application = express();
 const PORT = process.env.PORT || 8000;
 const httpServer = createServer(app);
 
+// Initialize services
+const permissionService = new PermissionService(postgresClient);
+app.set('permissionService', permissionService);
+
 // Middleware
 app.use(helmet());
 app.use(cors());
