@@ -82,11 +82,13 @@ export const VaultManager: React.FC<VaultManagerProps> = ({
     setLoading(true);
     setError('');
     try {
-      await vaultClient.storeItem(userId, {
-        nodeType: newItem.type,
-        nodeLabel: newItem.label,
-        data: { content: newItem.data },
-      });
+      await vaultClient.storeItem(
+        userId,
+        newItem.type,
+        newItem.label,
+        { content: newItem.data },
+        { tags: [] }
+      );
       setNewItem({ label: '', type: 'note', data: '' });
       setShowAddForm(false);
       await loadItems();
