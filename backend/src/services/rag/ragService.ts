@@ -156,9 +156,38 @@ export async function queryRAG(
 
     logger.info(`LLM response generated: ${llmResponse.usage.totalTokens} tokens`);
 
-    // Step 6: Parse response and extract citations
-    const citedSourceIds = parseCitations(llmResponse.content);
-    const confidence = extractConfidence(llmResponse.content);
+    // Step 6: Validate LLM response with guardrails
+    const guardrailSources: GuardrailSource[] = sources.map(s => ({
+      id: s.source_id,
+      content: s.content,
+      metadata: s.metadata
+    }));
+    
+    const validation = await validateLLMResponse(
+      llmResponse.content,
+      guardrailSources,
+      request.query
+    );
+    
+    logger.info('LLM response validation', {
+      isValid: validation.isValid,
+      confidence: validation.confidence,
+      issues: validation.issues.length,
+      shouldUseFallback: validation.shouldReturnFallback
+    });
+    
+    // If validation fails critically, use fallback response
+    let finalResponse = llmResponse.content;
+    if (validation.shouldReturnFallback) {
+      finalResponse = validation.correctedResponse || FALLBACK_RESPONSES.noData;
+      logger.warn('LLM response failed validation, using fallback', {
+        issues: validation.issues
+      });
+    }
+    
+    // Step 7: Parse response and extract citations
+    const citedSourceIds = parseCitations(finalResponse);
+    const confidence = validation.shouldReturnFallback ? 'none' : extractConfidence(finalResponse);
 
     // Build citation list with scores
     const citations = citedSourceIds
