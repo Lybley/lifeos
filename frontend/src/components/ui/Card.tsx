@@ -1,61 +1,72 @@
 import React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 
-interface CardProps {
-  children: React.ReactNode;
-  className?: string;
-  hover?: boolean;
-  padding?: 'none' | 'sm' | 'md' | 'lg';
+const cardVariants = cva('rounded-lg border bg-white transition-shadow', {
+  variants: {
+    variant: {
+      default: 'border-gray-200 shadow-sm hover:shadow-md',
+      elevated: 'border-gray-200 shadow-md hover:shadow-lg',
+      outlined: 'border-2 border-gray-300 shadow-none',
+      ghost: 'border-transparent shadow-none',
+    },
+    padding: {
+      none: 'p-0',
+      sm: 'p-4',
+      md: 'p-6',
+      lg: 'p-8',
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+    padding: 'md',
+  },
+});
+
+export interface CardProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof cardVariants> {
+  hoverable?: boolean;
 }
 
-export const Card: React.FC<CardProps> = ({
-  children,
-  className = '',
-  hover = false,
-  padding = 'md',
-}) => {
-  const paddingStyles = {
-    none: '',
-    sm: 'p-3',
-    md: 'p-6',
-    lg: 'p-8',
-  };
-
-  return (
-    <div
-      className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm ${
-        hover ? 'hover:shadow-md transition-shadow cursor-pointer' : ''
-      } ${paddingStyles[padding]} ${className}`}
-    >
-      {children}
-    </div>
-  );
-};
-
-interface CardHeaderProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
-export const CardHeader: React.FC<CardHeaderProps> = ({ children, className = '' }) => (
-  <div className={`mb-4 ${className}`}>{children}</div>
+export const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, variant, padding, hoverable, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cardVariants({
+          variant,
+          padding,
+          className: hoverable ? `${className} cursor-pointer` : className,
+        })}
+        {...props}
+      />
+    );
+  }
 );
 
-interface CardTitleProps {
-  children: React.ReactNode;
-  className?: string;
-}
+Card.displayName = 'Card';
 
-export const CardTitle: React.FC<CardTitleProps> = ({ children, className = '' }) => (
-  <h3 className={`text-xl font-semibold text-gray-900 dark:text-white ${className}`}>
-    {children}
-  </h3>
-);
+export const CardHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
+  className,
+  ...props
+}) => <div className={`mb-4 ${className || ''}`} {...props} />;
 
-interface CardContentProps {
-  children: React.ReactNode;
-  className?: string;
-}
+export const CardTitle: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({
+  className,
+  ...props
+}) => <h3 className={`text-xl font-semibold text-gray-900 ${className || ''}`} {...props} />;
 
-export const CardContent: React.FC<CardContentProps> = ({ children, className = '' }) => (
-  <div className={className}>{children}</div>
-);
+export const CardDescription: React.FC<React.HTMLAttributes<HTMLParagraphElement>> = ({
+  className,
+  ...props
+}) => <p className={`text-sm text-gray-600 ${className || ''}`} {...props} />;
+
+export const CardContent: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
+  className,
+  ...props
+}) => <div className={className} {...props} />;
+
+export const CardFooter: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
+  className,
+  ...props
+}) => <div className={`mt-4 flex items-center gap-2 ${className || ''}`} {...props} />;
