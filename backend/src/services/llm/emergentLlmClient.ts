@@ -62,8 +62,13 @@ export class OpenAILLMClient extends BaseLLMClient {
 
   constructor(config: LLMConfig) {
     super(config);
+    // Use LLM proxy if Emergent key is detected
+    const isEmergentKey = config.apiKey.startsWith('sk-emergent-');
+    const baseURL = isEmergentKey ? (process.env.LLM_PROXY_URL || 'http://localhost:8002') : undefined;
+    
     this.client = new OpenAI({
       apiKey: config.apiKey,
+      baseURL: baseURL,
     });
   }
 
