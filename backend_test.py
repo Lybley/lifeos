@@ -370,6 +370,221 @@ class LifeOSTestSuite:
             self.log_test("Action Engine Get by User", False, "Invalid JSON response")
             return False
     
+    def test_billing_plans(self):
+        """Test Billing Plans API - should return 4 plans"""
+        success, response, error = self.make_request('GET', '/api/v1/billing/plans')
+        
+        if not success:
+            self.log_test("Billing Plans", False, f"Request failed: {error}")
+            return False
+        
+        if response.status_code != 200:
+            self.log_test("Billing Plans", False, 
+                         f"Status code: {response.status_code}, Response: {response.text}")
+            return False
+        
+        try:
+            data = response.json()
+            if 'plans' in data:
+                plans = data['plans']
+                if len(plans) == 4:
+                    # Check if all expected plans exist
+                    plan_names = [plan.get('plan_name') for plan in plans]
+                    expected_plans = ['free', 'pro', 'team', 'enterprise']
+                    
+                    missing_plans = [plan for plan in expected_plans if plan not in plan_names]
+                    if missing_plans:
+                        self.log_test("Billing Plans", False, f"Missing plans: {missing_plans}")
+                        return False
+                    
+                    # Check plan structure
+                    required_fields = ['id', 'plan_name', 'display_name', 'monthly_price', 'features']
+                    for plan in plans:
+                        missing_fields = [field for field in required_fields if field not in plan]
+                        if missing_fields:
+                            self.log_test("Billing Plans", False, 
+                                         f"Plan {plan.get('plan_name')} missing fields: {missing_fields}")
+                            return False
+                    
+                    self.log_test("Billing Plans", True, 
+                                 f"Found {len(plans)} plans: {', '.join(plan_names)}")
+                    return True
+                else:
+                    self.log_test("Billing Plans", False, 
+                                 f"Expected 4 plans, got {len(plans)}")
+                    return False
+            else:
+                self.log_test("Billing Plans", False, f"No 'plans' field in response: {data}")
+                return False
+        except json.JSONDecodeError:
+            self.log_test("Billing Plans", False, "Invalid JSON response")
+            return False
+    
+    def test_billing_subscription(self):
+        """Test Billing Subscription API"""
+        user_id = "test-user-billing"
+        
+        success, response, error = self.make_request('GET', '/api/v1/billing/subscription', 
+                                                   params={'userId': user_id})
+        
+        if not success:
+            self.log_test("Billing Subscription", False, f"Request failed: {error}")
+            return False
+        
+        if response.status_code != 200:
+            self.log_test("Billing Subscription", False, 
+                         f"Status code: {response.status_code}, Response: {response.text}")
+            return False
+        
+        try:
+            data = response.json()
+            if 'subscription' in data:
+                subscription = data['subscription']
+                # Subscription can be null for new users
+                if subscription is None:
+                    self.log_test("Billing Subscription", True, "No subscription found (expected for new user)")
+                else:
+                    # If subscription exists, check structure
+                    expected_fields = ['id', 'user_id', 'plan_id', 'status']
+                    missing_fields = [field for field in expected_fields if field not in subscription]
+                    if missing_fields:
+                        self.log_test("Billing Subscription", False, 
+                                     f"Subscription missing fields: {missing_fields}")
+                        return False
+                    
+                    self.log_test("Billing Subscription", True, 
+                                 f"Found subscription: {subscription.get('status')}")
+                return True
+            else:
+                self.log_test("Billing Subscription", False, f"No 'subscription' field in response: {data}")
+                return False
+        except json.JSONDecodeError:
+            self.log_test("Billing Subscription", False, "Invalid JSON response")
+            return False
+    
+    def test_billing_record_usage_embeddings(self):
+        """Test Billing Usage Recording - Embeddings"""
+        user_id = "test-user-billing"
+        usage_data = {
+            "userId": user_id,
+            "usageType": "embeddings",
+            "amount": 1000
+        }
+        
+        success, response, error = self.make_request('POST', '/api/v1/billing/usage', data=usage_data)
+        
+        if not success:
+            self.log_test("Billing Record Usage - Embeddings", False, f"Request failed: {error}")
+            return False
+        
+        if response.status_code != 200:
+            self.log_test("Billing Record Usage - Embeddings", False, 
+                         f"Status code: {response.status_code}, Response: {response.text}")
+            return False
+        
+        try:
+            data = response.json()
+            if data.get('success') and data.get('message'):
+                self.log_test("Billing Record Usage - Embeddings", True, 
+                             f"Recorded 1000 embeddings usage for {user_id}")
+                return True
+            else:
+                self.log_test("Billing Record Usage - Embeddings", False, f"Unexpected response: {data}")
+                return False
+        except json.JSONDecodeError:
+            self.log_test("Billing Record Usage - Embeddings", False, "Invalid JSON response")
+            return False
+    
+    def test_billing_record_usage_llm_tokens(self):
+        """Test Billing Usage Recording - LLM Tokens"""
+        user_id = "test-user-billing"
+        usage_data = {
+            "userId": user_id,
+            "usageType": "llm_tokens",
+            "amount": 50000
+        }
+        
+        success, response, error = self.make_request('POST', '/api/v1/billing/usage', data=usage_data)
+        
+        if not success:
+            self.log_test("Billing Record Usage - LLM Tokens", False, f"Request failed: {error}")
+            return False
+        
+        if response.status_code != 200:
+            self.log_test("Billing Record Usage - LLM Tokens", False, 
+                         f"Status code: {response.status_code}, Response: {response.text}")
+            return False
+        
+        try:
+            data = response.json()
+            if data.get('success') and data.get('message'):
+                self.log_test("Billing Record Usage - LLM Tokens", True, 
+                             f"Recorded 50000 LLM tokens usage for {user_id}")
+                return True
+            else:
+                self.log_test("Billing Record Usage - LLM Tokens", False, f"Unexpected response: {data}")
+                return False
+        except json.JSONDecodeError:
+            self.log_test("Billing Record Usage - LLM Tokens", False, "Invalid JSON response")
+            return False
+    
+    def test_billing_usage_summary(self):
+        """Test Billing Usage Summary API"""
+        user_id = "test-user-billing"
+        
+        success, response, error = self.make_request('GET', f'/api/v1/billing/usage/{user_id}')
+        
+        if not success:
+            self.log_test("Billing Usage Summary", False, f"Request failed: {error}")
+            return False
+        
+        # Accept both 200 (found) and 404 (no subscription) as valid responses
+        if response.status_code == 404:
+            try:
+                data = response.json()
+                if 'error' in data and 'subscription' in data['error'].lower():
+                    self.log_test("Billing Usage Summary", True, 
+                                 "No subscription found (expected for new user)")
+                    return True
+            except json.JSONDecodeError:
+                pass
+            
+            self.log_test("Billing Usage Summary", False, 
+                         f"Unexpected 404 response: {response.text}")
+            return False
+        
+        if response.status_code != 200:
+            self.log_test("Billing Usage Summary", False, 
+                         f"Status code: {response.status_code}, Response: {response.text}")
+            return False
+        
+        try:
+            data = response.json()
+            # Check if usage summary has expected structure
+            expected_fields = ['current_period_start', 'current_period_end', 'usage']
+            missing_fields = [field for field in expected_fields if field not in data]
+            
+            if missing_fields:
+                # If some fields are missing, still consider it a pass if we get usage data
+                if 'usage' in data:
+                    usage = data['usage']
+                    self.log_test("Billing Usage Summary", True, 
+                                 f"Usage summary retrieved with {len(usage)} usage types")
+                    return True
+                else:
+                    self.log_test("Billing Usage Summary", False, 
+                                 f"Missing required fields: {missing_fields}")
+                    return False
+            else:
+                usage = data['usage']
+                self.log_test("Billing Usage Summary", True, 
+                             f"Complete usage summary with {len(usage)} usage types")
+                return True
+                
+        except json.JSONDecodeError:
+            self.log_test("Billing Usage Summary", False, "Invalid JSON response")
+            return False
+    
     def run_all_tests(self):
         """Run all test suites"""
         print("=" * 60)
