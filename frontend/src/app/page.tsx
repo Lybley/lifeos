@@ -11,29 +11,76 @@ import Link from 'next/link';
 export default function DashboardPage() {
   const [stats, setStats] = useState({
     totalNodes: 0,
-    connections: 3,
-    recentChats: 12,
-    actionsToday: 5,
+    connections: 0,
+    recentActions: 0,
+    pendingActions: 0,
+    recentEvents: 0,
   });
 
-  const [recentActivity, setRecentActivity] = useState([
-    { id: 1, type: 'chat', title: 'Asked about Q4 meetings', time: '5 minutes ago' },
-    { id: 2, type: 'action', title: 'Created calendar event', time: '1 hour ago' },
-    { id: 3, type: 'sync', title: 'Gmail sync completed', time: '2 hours ago' },
-    { id: 4, type: 'upload', title: 'Uploaded 3 documents', time: '3 hours ago' },
-  ]);
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const userId = 'test-user-123'; // Mock user ID
 
   useEffect(() => {
-    const loadStats = async () => {
-      try {
-        const nodes = await apiClient.getNodes();
-        setStats(prev => ({ ...prev, totalNodes: nodes.length || 0 }));
-      } catch (error) {
-        console.error('Failed to load stats:', error);
-      }
-    };
-    loadStats();
+    loadDashboardData();
   }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      
+      // Load nodes
+      const nodes = await apiClient.getNodes();
+      
+      // Load actions
+      const actions = await apiClient.getUserActions(userId, 20);
+      const pendingActions = actions?.actions?.filter((a: any) => a.status === 'pending') || [];
+      
+      // Load events
+      const events = await apiClient.getEvents(userId, { limit: 10 });
+      
+      setStats({
+        totalNodes: nodes?.length || 0,
+        connections: 3, // Static for now
+        recentActions: actions?.actions?.length || 0,
+        pendingActions: pendingActions.length,
+        recentEvents: events?.events?.length || 0,
+      });
+
+      // Combine recent activity
+      const activity = [];
+      
+      // Add recent actions
+      if (actions?.actions) {
+        actions.actions.slice(0, 3).forEach((action: any) => {
+          activity.push({
+            id: action.id,
+            type: 'action',
+            title: `${action.action_type}: ${action.status}`,
+            time: new Date(action.created_at).toLocaleString(),
+          });
+        });
+      }
+
+      // Add recent events
+      if (events?.events) {
+        events.events.slice(0, 2).forEach((event: any) => {
+          activity.push({
+            id: event.id,
+            type: 'event',
+            title: `${event.event_type}`,
+            time: new Date(event.event_time).toLocaleString(),
+          });
+        });
+      }
+
+      setRecentActivity(activity);
+    } catch (error) {
+      console.error('Failed to load dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getActivityIcon = (type: string) => {
     switch (type) {
