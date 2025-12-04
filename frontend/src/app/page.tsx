@@ -266,6 +266,10 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+      
+      {/* Onboarding Components */}
+      <OnboardingChecklist />
+      <TooltipManager />
     </div>
   );
 }
