@@ -33,7 +33,12 @@ export interface VectorSearchOptions {
  */
 export async function generateQueryEmbedding(query: string, apiKey: string): Promise<number[]> {
   try {
-    const openai = new OpenAI({ apiKey });
+    // Check if using Emergent LLM Key
+    const isEmergentKey = apiKey.startsWith('sk-emergent-');
+    const openai = new OpenAI({ 
+      apiKey,
+      baseURL: isEmergentKey ? 'https://api.emergentmethods.ai/v1' : undefined
+    });
     
     // Use same model as ingest service for consistency
     const model = process.env.EMBEDDING_MODEL || 'text-embedding-3-small';
