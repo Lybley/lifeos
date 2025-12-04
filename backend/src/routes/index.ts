@@ -30,6 +30,7 @@ router.use('/v1/events', eventsRouter);
 router.use('/v1/ingestion', ingestionRouter);
 router.use('/v1/planner', plannerRouter);
 router.use('/v1/vault', vaultRouter);
+router.use('/v1/admin', adminRouter);
 
 // API info
 router.get('/', (req, res) => {
