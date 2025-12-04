@@ -117,6 +117,9 @@ export class VaultClient {
     this.vaultConfig = configData;
 
     // Derive key from passphrase
+    if (!this.vaultConfig) {
+      throw new Error('Vault config not loaded');
+    }
     const salt = hexToBytes(this.vaultConfig.kdf_salt_hex);
     try {
       this.encryptionKey = await deriveKeyFromPassphrase(
