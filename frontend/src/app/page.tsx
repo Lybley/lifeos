@@ -182,7 +182,7 @@ export default function DashboardPage() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Link href="/chat">
+        <Link href="/chat" className="chat-link">
           <Button variant="outline" className="w-full justify-start" size="lg">
             <MessageSquare className="w-5 h-5 mr-2" />
             Ask a Question
