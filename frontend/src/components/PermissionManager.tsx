@@ -148,7 +148,7 @@ export function PermissionManager() {
           <p className="text-gray-600">Control what data LifeOS can access</p>
         </div>
         <Button
-          variant="destructive"
+          variant="danger"
           onClick={handleRevokeAll}
         >
           Revoke All Permissions
