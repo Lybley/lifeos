@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Switch } from '@/components/ui/Switch';
-import { Label } from '@/components/ui/label';
+import { Label } from '@/components/ui/Label';
 import { Badge } from '@/components/ui/badge';
 import { AlertCircle, Shield, Info } from 'lucide-react';
 
