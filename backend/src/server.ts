@@ -98,6 +98,14 @@ const startServer = async () => {
       logger.warn('Action worker not initialized (Redis may not be available)');
     }
     
+    // Initialize Google sync worker if Redis is available
+    try {
+      const { googleSyncWorker } = await import('./services/ingestion/googleDataWorker');
+      logger.info('Google Data Ingestion worker initialized');
+    } catch (workerError) {
+      logger.warn('Google sync worker not initialized (Redis may not be available)');
+    }
+    
     // Initialize WebSocket server
     initializeWebSocket(httpServer);
     
