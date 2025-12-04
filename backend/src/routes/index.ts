@@ -38,6 +38,8 @@ router.get('/', (req, res) => {
       agents: '/api/v1/agents',
       actions: '/api/actions',
       privacy: '/api/v1/privacy',
+      permissions: '/api/v1/permissions',
+      events: '/api/v1/events',
     },
   });
 });
