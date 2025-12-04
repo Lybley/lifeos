@@ -54,6 +54,7 @@ router.get('/', (req, res) => {
       planner: '/api/v1/planner',
       vault: '/api/v1/vault',
       admin: '/api/v1/admin',
+      billing: '/api/v1/billing',
     },
   });
 });
