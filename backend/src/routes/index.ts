@@ -51,6 +51,7 @@ router.get('/', (req, res) => {
       ingestion: '/api/v1/ingestion',
       planner: '/api/v1/planner',
       vault: '/api/v1/vault',
+      admin: '/api/v1/admin',
     },
   });
 });
