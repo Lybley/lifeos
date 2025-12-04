@@ -9,8 +9,9 @@ import apiClient from '@/lib/api-client';
 import Link from 'next/link';
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist';
 import { TooltipManager } from '@/components/onboarding/TooltipManager';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
-export default function DashboardPage() {
+function DashboardContent() {
   const [stats, setStats] = useState({
     totalNodes: 0,
     connections: 0,
