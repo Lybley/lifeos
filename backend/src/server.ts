@@ -18,6 +18,7 @@ import { initializeWebSocket } from './config/websocket';
 import logger from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
 import { authMiddleware } from './middleware/auth';
+import { PermissionService } from './permissions/PermissionService';
 import apiRoutes from './routes';
 // Worker will be initialized conditionally
 let actionWorker: any = null;
