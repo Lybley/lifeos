@@ -48,7 +48,7 @@ export default function DashboardPage() {
       });
 
       // Combine recent activity
-      const activity = [];
+      const activity: any[] = [];
       
       // Add recent actions
       if (actions?.actions) {
