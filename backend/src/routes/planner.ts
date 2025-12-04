@@ -15,7 +15,7 @@ import {
   ScheduledBlock,
 } from '../services/planner/plannerModels';
 import logger from '../utils/logger';
-import db from '../db/client';
+import { postgresClient as db } from '../config/postgres';
 
 const router = Router();
 
