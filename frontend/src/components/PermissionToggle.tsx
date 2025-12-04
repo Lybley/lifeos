@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Switch } from '@/components/ui/switch';
+import { Switch } from '@/components/ui/Switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { AlertCircle, Shield, Info } from 'lucide-react';
