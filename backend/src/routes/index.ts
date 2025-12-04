@@ -26,6 +26,7 @@ router.use('/v1/privacy', privacyRouter);
 router.use('/v1/permissions', permissionsRouter);
 router.use('/v1/events', eventsRouter);
 router.use('/v1/ingestion', ingestionRouter);
+router.use('/v1/planner', plannerRouter);
 
 // API info
 router.get('/', (req, res) => {
