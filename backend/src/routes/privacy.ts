@@ -5,6 +5,7 @@
 
 import { Router, Request, Response } from 'express';
 import { postgresClient } from '../config/postgres';
+import { requirePermission, AuthenticatedRequest } from '../permissions/PermissionMiddleware';
 import logger from '../utils/logger';
 import { privacyService } from '../services/encryption/privacyService';
 
