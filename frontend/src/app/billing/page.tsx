@@ -202,9 +202,9 @@ function BillingContent() {
                 )}
                 <CardHeader>
                   <CardTitle className="text-center">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">{plan.name}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">{plan.display_name}</div>
                     <div className="text-3xl font-bold mt-2">
-                      {formatPrice(plan.price_monthly)}
+                      {formatPrice(parseFloat(plan.monthly_price))}
                       <span className="text-sm font-normal text-gray-600">/month</span>
                     </div>
                   </CardTitle>
