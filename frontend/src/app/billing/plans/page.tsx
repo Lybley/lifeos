@@ -166,7 +166,7 @@ function PlansContent() {
                   </ul>
                   <Button
                     className="w-full"
-                    variant={plan.is_popular ? 'default' : 'outline'}
+                    variant={plan.is_popular ? 'primary' : 'outline'}
                     size="lg"
                     disabled={currentPlanId === plan.id}
                   >
