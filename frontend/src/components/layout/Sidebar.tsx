@@ -11,6 +11,7 @@ import {
   Settings,
   Brain,
   Zap,
+  CreditCard,
 } from 'lucide-react';
 
 const navigation = [
@@ -20,6 +21,7 @@ const navigation = [
   { name: 'Upload', href: '/upload', icon: Upload },
   { name: 'Connections', href: '/connections', icon: LinkIcon },
   { name: 'Actions', href: '/actions', icon: Zap },
+  { name: 'Billing', href: '/billing', icon: CreditCard },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
