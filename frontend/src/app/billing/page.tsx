@@ -49,7 +49,11 @@ function BillingContent() {
       const plansResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/billing/plans`);
       if (plansResponse.ok) {
         const plansData = await plansResponse.json();
-        setPlans(plansData.plans || []);
+        const plansWithPopular = plansData.plans.map((plan: BillingPlan) => ({
+          ...plan,
+          is_popular: plan.plan_name === 'pro'
+        }));
+        setPlans(plansWithPopular || []);
       }
 
       // Load user's current subscription
