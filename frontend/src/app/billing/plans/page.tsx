@@ -132,29 +132,7 @@ function PlansContent() {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-4 mb-8">
-                    <li className="flex items-start">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm">
-                        <strong>{formatNumber(plan.features.embeddings_limit)}</strong> embeddings/month
-                      </span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm">
-                        <strong>{formatNumber(plan.features.llm_tokens_limit)}</strong> LLM tokens/month
-                      </span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm">
-                        <strong>{plan.features.storage_gb}GB</strong> storage
-                      </span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm"><strong>{plan.features.support_level}</strong> support</span>
-                    </li>
-                    {plan.features.additional_features?.map((feature, idx) => (
+                    {plan.features.map((feature, idx) => (
                       <li key={idx} className="flex items-start">
                         <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
                         <span className="text-sm">{feature}</span>
