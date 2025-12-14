@@ -228,7 +228,7 @@ function BillingContent() {
                   </ul>
                   <Button 
                     className="w-full" 
-                    variant={plan.is_popular ? 'default' : 'outline'}
+                    variant={plan.is_popular ? 'primary' : 'outline'}
                     disabled={subscription?.plan_id === plan.id}
                   >
                     {subscription?.plan_id === plan.id ? 'Current Plan' : 'Select Plan'}
