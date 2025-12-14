@@ -10,16 +10,16 @@ import Link from 'next/link';
 
 interface BillingPlan {
   id: string;
-  name: string;
-  stripe_price_id: string;
-  price_monthly: number;
-  features: {
-    embeddings_limit: number;
-    llm_tokens_limit: number;
-    storage_gb: number;
-    support_level: string;
-    additional_features?: string[];
-  };
+  plan_name: string;
+  display_name: string;
+  description: string;
+  monthly_price: string;
+  annual_price: string;
+  vector_quota: number | null;
+  agent_quota: number | null;
+  auto_actions_enabled: boolean;
+  max_team_seats: number;
+  features: string[];
   is_popular?: boolean;
 }
 
