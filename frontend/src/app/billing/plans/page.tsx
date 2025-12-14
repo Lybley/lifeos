@@ -43,11 +43,7 @@ function PlansContent() {
         // Add additional features for display
         const enhancedPlans = data.plans.map((plan: BillingPlan) => ({
           ...plan,
-          features: {
-            ...plan.features,
-            additional_features: getAdditionalFeatures(plan.name),
-          },
-          is_popular: plan.name === 'Pro',
+          is_popular: plan.plan_name === 'pro',
         }));
         setPlans(enhancedPlans);
       }
