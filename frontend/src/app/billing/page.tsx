@@ -114,7 +114,7 @@ function BillingContent() {
               <div>
                 <div className="flex items-center gap-3 mb-2">
                   <h3 className="text-2xl font-bold">
-                    {plans.find(p => p.id === subscription.plan_id)?.name || 'Loading...'}
+                    {plans.find(p => p.id === subscription.plan_id)?.display_name || 'Loading...'}
                   </h3>
                   {getStatusBadge(subscription.status)}
                 </div>
