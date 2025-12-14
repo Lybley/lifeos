@@ -211,22 +211,12 @@ function BillingContent() {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-3 mb-6">
-                    <li className="flex items-center text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
-                      {formatNumber(plan.features.embeddings_limit)} embeddings/month
-                    </li>
-                    <li className="flex items-center text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
-                      {formatNumber(plan.features.llm_tokens_limit)} LLM tokens/month
-                    </li>
-                    <li className="flex items-center text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
-                      {plan.features.storage_gb}GB storage
-                    </li>
-                    <li className="flex items-center text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
-                      {plan.features.support_level} support
-                    </li>
+                    {plan.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-center text-sm">
+                        <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                        {feature}
+                      </li>
+                    ))}
                   </ul>
                   <Button 
                     className="w-full" 
