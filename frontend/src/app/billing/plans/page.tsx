@@ -120,11 +120,11 @@ function PlansContent() {
                 <CardHeader className="text-center pb-6">
                   <CardTitle>
                     <div className="text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-                      {plan.name}
+                      {plan.display_name}
                     </div>
                     <div className="mt-4 flex items-baseline justify-center">
                       <span className="text-5xl font-extrabold">
-                        {formatPrice(plan.price_monthly)}
+                        {formatPrice(parseFloat(plan.monthly_price))}
                       </span>
                       <span className="text-xl font-medium text-gray-600 ml-2">/month</span>
                     </div>
