@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeOS - Testing Links & Access Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            color: #333;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .link-card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .link-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            background: #e9ecef;
+        }
+        
+        .link-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .link-url {
+            color: #667eea;
+            text-decoration: none;
+            font-family: 'Courier New', monospace;
+            display: block;
+            margin-bottom: 8px;
+            word-break: break-all;
+        }
+        
+        .link-url:hover {
+            text-decoration: underline;
+        }
+        
+        .link-description {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .feature-list {
+            list-style: none;
+            margin-top: 10px;
+        }
+        
+        .feature-list li {
+            padding: 5px 0;
+            color: #555;
+        }
+        
+        .feature-list li:before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .status-working {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-admin {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .user-ids {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .user-id {
+            font-family: 'Courier New', monospace;
+            color: #0066cc;
+            font-weight: bold;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .quick-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+        
+        .quick-link:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        
+        .quick-link-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .stats {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 LifeOS Testing Links</h1>
+        <p class="subtitle">Complete access guide for testing all features</p>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number">16</div>
+                <div class="stat-label">Frontend Pages</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Working</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">3</div>
+                <div class="stat-label">Onboarding Flows</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">5</div>
+                <div class="stat-label">Admin Pages</div>
+            </div>
+        </div>
+        
+        <div class="section-title">⚡ Quick Access</div>
+        <div class="grid">
+            <a href="/landing" class="quick-link">
+                <div class="quick-link-title">🚀 Landing Page</div>
+                <div>Start Here</div>
+            </a>
+            <a href="/onboarding/flow" class="quick-link">
+                <div class="quick-link-title">📝 Onboarding</div>
+                <div>8-Step Flow</div>
+            </a>
+            <a href="/" class="quick-link">
+                <div class="quick-link-title">🏠 Dashboard</div>
+                <div>Main App</div>
+            </a>
+            <a href="/admin" class="quick-link">
+                <div class="quick-link-title">🔐 Admin</div>
+                <div>Admin Panel</div>
+            </a>
+        </div>
+        
+        <!-- User Onboarding Section -->
+        <div class="section">
+            <div class="section-title">🚀 User Onboarding & Landing Pages</div>
+            
+            <div class="link-card">
+                <div class="link-title">Landing Page <span class="status-badge status-working">✓ Working</span></div>
+                <a href="/landing" class="link-url" target="_blank">/landing</a>
+                <div class="link-description">
+                    High-converting marketing page with email capture, feature showcase, and CTA buttons
+                </div>
+            </div>
+            
+            <div class="link-card">
+                <div class="link-title">Progressive Onboarding (8-Step) <span class="status-badge status-working">✓ Working</span></div>
+                <a href="/onboarding/flow" class="link-url" target="_blank">/onboarding/flow</a>
+                <div class="link-description">
+                    Complete interactive onboarding experience
+                </div>
+                <ul class="feature-list">
+                    <li>Welcome & Signup (name/email capture)</li>
+                    <li>Gmail Connection (optional, skippable)</li>
+                    <li>File Import (drag & drop)</li>
+                    <li>3 Feature Tours (Memory Graph, AI Agents, Smart Planner)</li>
+                    <li>First Query Experience</li>
+                    <li>Privacy & Security Education</li>
+                </ul>
+            </div>
+            
+            <div class="link-card">
+                <div class="link-title">Alternative Onboarding (4-Step) <span class="status-badge status-working">✓ Working</span></div>
+                <a href="/onboarding" class="link-url" target="_blank">/onboarding</a>
+                <div class="link-description">
+                    Simplified onboarding for experienced users
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main User Features Section -->
+        <div class="section">
+            <div class="section-title">👤 Main User Dashboard & Features</div>
+            
+            <div class="link-card">
+                <div class="link-title">Main Dashboard <span class="status-badge status-working">✓ Working</span></div>
+                <a href="/" class="link-url" target="_blank">/</a>
+                <div class="link-description">
+                    User home page with stats, activity feed, quick actions, onboarding checklist, and contextual tooltips
+                </div>
+            </div>
+            
+            <div class="link-card">
+                <div class="link-title">Chat <span class="status-badge status-working">✓ Working</span></div>
+                <a href="/chat" class="link-url" target="_blank">/chat</a>
+                <div class="link-description">
+                    AI-powered conversation interface with message history
+                </div>
+            </div>
+            
+            <div class="link-card">
+                <div class="link-title">Memory Graph <span class="status-badge status-working">✓ Working</span></div>
+                <a href="/memory" class="link-url" target="_blank">/memory</a>
+                <div class="link-description">
+                    Interactive knowledge graph visualization
+                </div>
+            </div>
+            
+            <div class="link-card">
+                <div class="link-title">Upload <span class="status-badge status-working">✓ Working</span></div>
+                <a href="/upload" class="link-url" target="_blank">/upload</a>
+                <div class="link-description">
+                    File upload interface with drag & drop
+                </div>
+            </div>
+            
+            <div class="link-card">
+                <div class="link-title">Connections <span class="status-badge status-working">✓ Working</span></div>
+                <a href="/connections" class="link-url" target="_blank">/connections</a>
+                <div class="link-description">
+                    Manage Gmail, Calendar, and third-party integrations
+                </div>
+            </div>
+            
+            <div class="link-card">
+                <div class="link-title">Actions <span class="status-badge status-working">✓ Working</span></div>
+                <a href="/actions" class="link-url" target="_blank">/actions</a>
+                <div class="link-description">
+                    View and manage AI-suggested actions
+                </div>
+            </div>
+            
+            <div class="link-card">
+                <div class="link-title">Settings <span class="status-badge status-working">✓ Working</span></div>
+                <a href="/settings" class="link-url" target="_blank">/settings</a>
+                <div class="link-description">
+                    User preferences, privacy settings, and encryption options
+                </div>
+            </div>
+            
+            <div class="link-card">
+                <div class="link-title">Vault <span class="status-badge status-working">✓ Working</span></div>
+                <a href="/vault" class="link-url" target="_blank">/vault</a>
+                <div class="link-description">
+                    Client-side encrypted vault for secure password storage
+                </div>
+                <ul class="feature-list">
+                    <li>3-step setup wizard with passphrase strength meter</li>
+                    <li>AES-GCM encryption with WebCrypto</li>
+                    <li>PBKDF2 key derivation (100,000 iterations)</li>
+                    <li>Recovery key generation</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Admin Section -->
+        <div class="section">
+            <div class="section-title">🔐 Admin Dashboard</div>
+            
+            <div class="link-card">
+                <div class="link-title">Admin Dashboard <span class="status-badge status-admin">🔐 Admin</span></div>
+                <a href="/admin" class="link-url" target="_blank">/admin</a>
+                <div class="link-description">
+                    Main admin page with system overview and metrics
+                </div>
+            </div>
+            
+            <div class="link-card">
+                <div class="link-title">User Management <span class="status-badge status-admin">🔐 Admin</span></div>
+                <a href="/admin/users" class="link-url" target="_blank">/admin/users</a>
+                <div class="link-description">
+                    View and manage all users, roles, and permissions
+                </div>
+            </div>
+            
+            <div class="link-card">
+                <div class="link-title">System Metrics <span class="status-badge status-admin">🔐 Admin</span></div>
+                <a href="/admin/metrics" class="link-url" target="_blank">/admin/metrics</a>
+                <div class="link-description">
+                    Performance metrics, API response times, and system health
+                </div>
+            </div>
+            
+            <div class="link-card">
+                <div class="link-title">Audit Logs <span class="status-badge status-admin">🔐 Admin</span></div>
+                <a href="/admin/audit" class="link-url" target="_blank">/admin/audit</a>
+                <div class="link-description">
+                    Complete audit trail with filtering and export
+                </div>
+            </div>
+            
+            <div class="link-card">
+                <div class="link-title">Support Tickets <span class="status-badge status-admin">🔐 Admin</span></div>
+                <a href="/admin/tickets" class="link-url" target="_blank">/admin/tickets</a>
+                <div class="link-description">
+                    Manage support tickets and user requests
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test Users Section -->
+        <div class="section">
+            <div class="section-title">👥 Test User IDs</div>
+            <div class="user-ids">
+                <p><strong>Regular Users:</strong></p>
+                <p><span class="user-id">test-user-123</span> - General testing user</p>
+                <p><span class="user-id">test-user-vault-123</span> - User with vault setup</p>
+                <p><span class="user-id">test-user-billing</span> - User with billing data</p>
+                <p><span class="user-id">test-user-1</span> - User with planner tasks</p>
+                <br>
+                <p><strong>Admin Users:</strong></p>
+                <p><span class="user-id">admin-user-1</span> - Primary admin user</p>
+                <p><span class="user-id">admin-user-2</span> - Secondary admin user</p>
+                <p><span class="user-id">test-admin-123</span> - Testing admin account</p>
+            </div>
+        </div>
+        
+        <div style="text-align: center; padding: 20px; color: #666; border-top: 2px solid #eee; margin-top: 40px;">
+            <p><strong>LifeOS Testing Suite</strong> | Last Updated: December 6, 2025</p>
+            <p>Status: ✅ All 16 Frontend Pages Working (100%)</p>
+        </div>
+    </div>
+</body>
+</html>
