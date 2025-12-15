@@ -350,34 +350,33 @@ router.get('/health', (req: Request, res: Response) => {
  */
 async function fetchUserTasks(userId: string): Promise<Task[]> {
   try {
-    const result = await db.query(
-      `SELECT * FROM tasks 
-       WHERE user_id = $1 AND status IN ('pending', 'scheduled')
-       ORDER BY priority DESC, due_date ASC`,
-      [userId]
-    );
+    const db = mongoClient.db();
+    const tasks = await db.collection('planner_tasks')
+      .find({ user_id: userId, status: { $in: ['pending', 'scheduled'] } })
+      .sort({ priority: -1, due_date: 1 })
+      .toArray();
 
-    return result.rows.map(row => ({
-      id: row.id,
-      userId: row.user_id,
-      title: row.title,
-      description: row.description,
-      dueDate: row.due_date ? new Date(row.due_date) : undefined,
-      estimatedDuration: row.estimated_duration || 60,
-      priority: row.priority || 'medium',
-      category: row.category || 'other',
-      tags: row.tags || [],
-      project: row.project,
-      requiresFocus: row.requires_focus || false,
-      requiresEnergy: row.requires_energy || 'medium',
-      canSplit: row.can_split || false,
-      minSessionDuration: row.min_session_duration,
-      dependsOn: row.depends_on,
-      blockedBy: row.blocked_by,
-      status: row.status,
-      completedAt: row.completed_at ? new Date(row.completed_at) : undefined,
-      createdAt: new Date(row.created_at),
-      updatedAt: new Date(row.updated_at),
+    return tasks.map(task => ({
+      id: task.id,
+      userId: task.user_id,
+      title: task.title,
+      description: task.description,
+      dueDate: task.due_date ? new Date(task.due_date) : undefined,
+      estimatedDuration: task.estimated_duration || 60,
+      priority: task.priority || 'medium',
+      category: task.category || 'other',
+      tags: task.tags || [],
+      project: task.project,
+      requiresFocus: task.requires_focus || false,
+      requiresEnergy: task.requires_energy || 'medium',
+      canSplit: task.can_split || false,
+      minSessionDuration: task.min_session_duration,
+      dependsOn: task.depends_on,
+      blockedBy: task.blocked_by,
+      status: task.status,
+      completedAt: task.completed_at ? new Date(task.completed_at) : undefined,
+      createdAt: new Date(task.created_at),
+      updatedAt: new Date(task.updated_at || task.created_at),
     }));
   } catch (error) {
     logger.error('Error fetching tasks:', error);
