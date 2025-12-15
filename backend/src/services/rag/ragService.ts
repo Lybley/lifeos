@@ -112,6 +112,7 @@ export async function queryRAG(
     }
 
     logger.info(`Found ${vectorResults.length} relevant chunks`);
+    logger.debug('First vector result metadata:', JSON.stringify(vectorResults[0]?.metadata || {}).substring(0, 200));
 
     // Step 2: Fetch graph context for the chunks
     const graphContextStart = Date.now();
