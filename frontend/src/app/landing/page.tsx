@@ -57,13 +57,49 @@ export default function LandingPage() {
 
   const heroContent = HERO_VARIANTS[variant];
 
+  const [submitting, setSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+
   const handleEmailCapture = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Integrate with Mailchimp/HubSpot
-    console.log('Email captured:', email);
-    setShowEmailCapture(false);
-    // Redirect to signup
-    router.push('/signup?email=' + encodeURIComponent(email));
+    setSubmitting(true);
+    setSubmitError('');
+    
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/marketing/subscribe`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          source: `landing_page_${variant}`,
+          metadata: {
+            variant,
+            timestamp: new Date().toISOString(),
+            userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : '',
+          },
+        }),
+      });
+
+      if (response.ok) {
+        setSubmitSuccess(true);
+        setShowEmailCapture(false);
+        // Redirect to signup after a brief delay
+        setTimeout(() => {
+          router.push('/onboarding/flow?email=' + encodeURIComponent(email));
+        }, 1500);
+      } else {
+        const data = await response.json();
+        setSubmitError(data.message || 'Failed to subscribe. Please try again.');
+      }
+    } catch (error) {
+      console.error('Email capture error:', error);
+      setSubmitError('Network error. Please check your connection and try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
