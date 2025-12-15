@@ -83,7 +83,8 @@ export async function queryRAG(
 
     // Step 1: Vector search for relevant chunks
     const vectorSearchStart = Date.now();
-    const apiKey = process.env.EMERGENT_LLM_KEY || process.env.OPENAI_API_KEY || '';
+    // Use OPENAI_API_KEY for embeddings (EMERGENT_LLM_KEY doesn't support embeddings)
+    const apiKey = process.env.OPENAI_API_KEY || '';
     
     const vectorResults = await searchByQuery(
       request.query,
