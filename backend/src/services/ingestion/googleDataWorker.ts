@@ -230,12 +230,9 @@ export function getGoogleSyncWorker() {
       });
     });
   }
+  }
   return googleSyncWorker;
 }
-
-googleSyncWorker.on('error', (error) => {
-  logger.error('Google sync worker error', { error: error.message });
-});
 
 // ============================================================================
 // HELPER FUNCTIONS
