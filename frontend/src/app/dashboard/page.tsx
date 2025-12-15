@@ -35,63 +35,66 @@ function DashboardContent() {
     needsReply: 5,
   });
   const [loading, setLoading] = useState(true);
-  const userId = 'test-user-123'; // Mock user ID
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    loadDashboardData();
+    // Get user from auth
+    const loadUser = async () => {
+      try {
+        const response = await apiClient.getCurrentUser();
+        setUserId(response.user.id);
+      } catch (error) {
+        console.error('Failed to load user:', error);
+      }
+    };
+    
+    loadUser();
   }, []);
 
+  useEffect(() => {
+    if (userId) {
+      loadDashboardData();
+    }
+  }, [userId]);
+
   const loadDashboardData = async () => {
+    if (!userId) return;
+    
     try {
       setLoading(true);
       
       // Load nodes
-      const nodes = await apiClient.getNodes();
+      try {
+        const nodes = await apiClient.getNodes();
+        setStats(prev => ({ ...prev, totalNodes: nodes?.length || 0 }));
+      } catch (err) {
+        console.error('Failed to load nodes:', err);
+      }
       
       // Load actions
-      const actions = await apiClient.getUserActions(userId, 20);
-      const pendingActions = actions?.actions?.filter((a: any) => a.status === 'pending') || [];
+      try {
+        const actions = await apiClient.getUserActions(userId, 20);
+        const pendingActions = actions?.actions?.filter((a: any) => a.status === 'pending') || [];
+        setStats(prev => ({ 
+          ...prev, 
+          recentActions: actions?.actions?.length || 0,
+          pendingActions: pendingActions.length 
+        }));
+      } catch (err) {
+        console.error('Failed to load actions:', err);
+      }
       
       // Load events
-      const events = await apiClient.getEvents(userId, { limit: 10 });
-      
-      setStats({
-        totalNodes: nodes?.length || 0,
-        connections: 3, // Static for now
-        recentActions: actions?.actions?.length || 0,
-        pendingActions: pendingActions.length,
-        recentEvents: events?.events?.length || 0,
-      });
+      try {
+        const events = await apiClient.getEvents(userId, { limit: 10 });
+        setStats(prev => ({ ...prev, recentEvents: events?.events?.length || 0 }));
+      } catch (err) {
+        console.error('Failed to load events:', err);
+      }
 
-      // Mock recent activity
-      setRecentActivity([
-        { id: 1, type: 'memory', title: 'Added new memory: Project planning notes', timestamp: '2 hours ago' },
-        { id: 2, type: 'action', title: 'Completed task: Review Q4 metrics', timestamp: '5 hours ago' },
-        { id: 3, type: 'connection', title: 'Gmail synced successfully', timestamp: '1 day ago' },
-        { id: 4, type: 'memory', title: 'Created note: Meeting with Sarah', timestamp: '1 day ago' },
-      ]);
-
-      // Mock recent memories
-      setRecentMemories([
-        { id: 1, title: 'Q4 Business Strategy', type: 'document', created: '2024-12-10', tags: ['business', 'strategy'] },
-        { id: 2, title: 'Team Meeting Notes', type: 'note', created: '2024-12-12', tags: ['meeting', 'team'] },
-        { id: 3, title: 'Product Roadmap 2025', type: 'document', created: '2024-12-14', tags: ['product', 'planning'] },
-      ]);
-
-      // Mock health data (in production, integrate with health APIs)
-      setHealthData({
-        sleep: 7.5,
-        steps: 8500,
-        mood: 'Good',
-        stress: 'Low',
-      });
-
-      // Mock inbox summary (in production, sync with Gmail)
-      setInboxSummary({
-        unread: 12,
-        important: 3,
-        needsReply: 5,
-      });
+      // For now, show empty states - user needs to add connections and data
+      setRecentActivity([]);
+      setRecentMemories([]);
 
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
