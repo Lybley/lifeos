@@ -13,7 +13,7 @@ dotenv.config();
 import { postgresClient } from './config/postgres';
 import { neo4jDriver } from './config/neo4j';
 import { pineconeClient } from './config/pinecone';
-import { queueConnection } from './config/queue';
+// import { queueConnection } from './config/queue'; // Commented out - Redis not available
 import { initializeWebSocket } from './config/websocket';
 import logger from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
