@@ -77,7 +77,8 @@ export async function validateLLMResponse(
   }
   
   // Step 7: Determine if response should be replaced with fallback
-  const criticalIssues = issues.filter(i => i.severity === 'critical' || i.severity === 'high');
+  // Only use fallback for critical issues (not high), as high severity can be false positives
+  const criticalIssues = issues.filter(i => i.severity === 'critical');
   const shouldReturnFallback = criticalIssues.length > 0;
   
   // Step 8: Calculate confidence score

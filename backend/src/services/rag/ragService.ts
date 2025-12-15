@@ -194,9 +194,8 @@ export async function queryRAG(
     });
     
     // If validation fails critically, use fallback response
-    // TEMPORARY: Disable guardrails to test RAG pipeline
     let finalResponse = llmResponse.content;
-    if (false && validation.shouldReturnFallback) {  // Disabled
+    if (validation.shouldReturnFallback) {
       finalResponse = validation.correctedResponse || FALLBACK_RESPONSES.noData;
       logger.warn('LLM response failed validation, using fallback', {
         issues: validation.issues
