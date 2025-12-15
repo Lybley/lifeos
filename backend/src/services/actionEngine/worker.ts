@@ -265,7 +265,7 @@ export async function approveAction(
   );
 
   // Add to queue for execution
-  await actionQueue.add('process', { actionId }, { priority: action.priority });
+  await getActionQueue().add('process', { actionId }, { priority: action.priority });
   logger.info(`Action ${actionId} approved and added to queue`);
 }
 
