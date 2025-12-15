@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { Brain, MessageSquare, Upload, Link as LinkIcon, TrendingUp, Clock, CheckCircle } from 'lucide-react';
+import { Brain, MessageSquare, Upload, Link as LinkIcon, TrendingUp, Clock, CheckCircle, Heart, Mail, Sparkles, Activity } from 'lucide-react';
 import apiClient from '@/lib/api-client';
 import Link from 'next/link';
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist';
