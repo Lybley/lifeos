@@ -21,6 +21,18 @@ function DashboardContent() {
   });
 
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [recentMemories, setRecentMemories] = useState<any[]>([]);
+  const [healthData, setHealthData] = useState({
+    sleep: 7.5,
+    steps: 8500,
+    mood: 'Good',
+    stress: 'Low',
+  });
+  const [inboxSummary, setInboxSummary] = useState({
+    unread: 12,
+    important: 3,
+    needsReply: 5,
+  });
   const [loading, setLoading] = useState(true);
   const userId = 'test-user-123'; // Mock user ID
 
