@@ -204,6 +204,20 @@ class ApiClient {
     const response = await this.client.post('/v1/events', data);
     return response.data;
   }
+
+  // ==================== AUTH ====================
+  
+  async getCurrentUser() {
+    const response = await this.client.get('/auth/me');
+    return response.data;
+  }
+
+  async logout() {
+    const response = await this.client.post('/auth/logout');
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('lifeos_user');
+    return response.data;
+  }
 }
 
 export const apiClient = new ApiClient();
