@@ -524,14 +524,7 @@ export async function getActionAuditLogs(actionId: string): Promise<any[]> {
 // ============================================================================
 // WORKER LIFECYCLE
 // ============================================================================
-
-actionWorker.on('completed', (job) => {
-  logger.info(`Job ${job.id} completed`);
-});
-
-actionWorker.on('failed', (job, err) => {
-  logger.error(`Job ${job?.id} failed:`, err.message);
-});
+// Event listeners are now handled within getActionWorker() function
 
 actionWorker.on('error', (err) => {
   logger.error('Worker error:', err);
