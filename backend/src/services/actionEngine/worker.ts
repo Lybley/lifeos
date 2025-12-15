@@ -126,6 +126,15 @@ export function getActionWorker() {
     concurrency: 5, // Process up to 5 actions concurrently
   }
 );
+
+    // Worker event handlers
+    actionWorker.on('completed', (job) => {
+      logger.info(`Job ${job.id} completed`);
+    });
+
+    actionWorker.on('failed', (job, err) => {
+      logger.error(`Job ${job?.id} failed:`, err.message);
+    });
   }
   return actionWorker;
 }
