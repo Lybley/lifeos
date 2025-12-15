@@ -28,24 +28,33 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSuc
     setError('');
 
     try {
-      // For now, simulate a successful signup/login
-      // In production, this would call your backend API
+      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Store user info in localStorage (temporary solution)
-      localStorage.setItem('lifeos_user', JSON.stringify({
+      // Create user object
+      const user = {
         name: formData.name || formData.email.split('@')[0],
         email: formData.email,
         authenticated: true,
         timestamp: new Date().toISOString()
-      }));
+      };
 
-      if (onSuccess) {
-        onSuccess();
-      } else {
-        // Redirect to dashboard
-        window.location.href = '/dashboard';
-      }
+      // Store in localStorage
+      localStorage.setItem('lifeos_user', JSON.stringify(user));
+      localStorage.setItem('lifeos_auth_token', 'demo_token_' + Date.now());
+      
+      // Set a cookie for server-side check (optional)
+      document.cookie = `lifeos_auth=true; path=/; max-age=86400; SameSite=Lax`;
+
+      // Close modal
+      onClose();
+
+      // Small delay to ensure storage is set
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Redirect to dashboard without using Auth0
+      window.location.href = '/dashboard';
+      
     } catch (err) {
       setError('Something went wrong. Please try again.');
       setLoading(false);
