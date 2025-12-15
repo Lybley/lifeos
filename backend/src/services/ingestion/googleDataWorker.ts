@@ -253,7 +253,7 @@ export async function scheduleGoogleSync(
     delay?: number;
   }
 ): Promise<void> {
-  await googleSyncQueue.add(
+  await getGoogleSyncQueue().add(
     `${service}-sync-${userId}`,
     {
       userId,
@@ -279,7 +279,7 @@ export async function scheduleRecurringSync(
   intervalMinutes: number = 60
 ): Promise<void> {
   for (const service of services) {
-    await googleSyncQueue.add(
+    await getGoogleSyncQueue().add(
       `${service}-sync-${userId}`,
       {
         userId,
@@ -306,7 +306,7 @@ export async function cancelRecurringSync(
   services: ('gmail' | 'drive' | 'calendar')[]
 ): Promise<void> {
   for (const service of services) {
-    await googleSyncQueue.removeRepeatable(`${service}-sync-${userId}`, {
+    await getGoogleSyncQueue().removeRepeatable(`${service}-sync-${userId}`, {
       every: 60 * 60 * 1000, // Default interval
     });
   }
