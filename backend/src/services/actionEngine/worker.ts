@@ -16,33 +16,39 @@ import { sendApprovalEmail } from './emailService';
 // QUEUE SETUP
 // ============================================================================
 
-export const actionQueue = new Queue('actions', {
-  connection: queueConnection,
-  defaultJobOptions: {
-    attempts: 3,
-    backoff: {
-      type: 'exponential',
-      delay: 2000,
-    },
-    removeOnComplete: {
-      age: 86400, // Keep completed jobs for 24 hours
-      count: 1000,
-    },
-    removeOnFail: {
-      age: 172800, // Keep failed jobs for 48 hours
-    },
-  },
-});
+let actionQueue: Queue | null = null;
+let actionWorker: Worker | null = null;
 
-// ============================================================================
-// WORKER
-// ============================================================================
+export function getActionQueue() {
+  if (!actionQueue) {
+    actionQueue = new Queue('actions', {
+      connection: queueConnection,
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 2000,
+        },
+        removeOnComplete: {
+          age: 86400, // Keep completed jobs for 24 hours
+          count: 1000,
+        },
+        removeOnFail: {
+          age: 172800, // Keep failed jobs for 48 hours
+        },
+      },
+    });
+  }
+  return actionQueue;
+}
 
-export const actionWorker = new Worker(
-  'actions',
-  async (job: Job) => {
-    const { actionId } = job.data;
-    logger.info(`Processing action ${actionId}`);
+export function getActionWorker() {
+  if (!actionWorker) {
+    actionWorker = new Worker(
+      'actions',
+      async (job: Job) => {
+        const { actionId} = job.data;
+        logger.info(`Processing action ${actionId}`);
 
     try {
       // Get action from database
