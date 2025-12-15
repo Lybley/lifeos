@@ -5,14 +5,13 @@ import { ConnectionManager } from '@/components/connections/ConnectionManager';
 import { Connection } from '@/components/connections/ConnectionCard';
 
 export default function ConnectionsPage() {
+  // Available connections - all start as disconnected for new users
   const [connections, setConnections] = useState<Connection[]>([
     {
       id: '1',
       name: 'Gmail',
       type: 'gmail',
-      status: 'connected',
-      lastSync: new Date(),
-      itemsCount: 1547,
+      status: 'disconnected',
       icon: '📧',
       description: 'Sync emails and contacts from your Gmail account',
     },
@@ -28,9 +27,7 @@ export default function ConnectionsPage() {
       id: '3',
       name: 'Google Calendar',
       type: 'google-calendar',
-      status: 'connected',
-      lastSync: new Date(Date.now() - 3600000),
-      itemsCount: 234,
+      status: 'disconnected',
       icon: '📅',
       description: 'Sync calendar events and meetings',
     },
@@ -54,48 +51,27 @@ export default function ConnectionsPage() {
 
   const handleConnect = async (id: string) => {
     console.log('Connecting:', id);
-    // Simulate OAuth flow
-    setConnections(prev =>
-      prev.map(c => (c.id === id ? { ...c, status: 'syncing' as const } : c))
-    );
+    // TODO: Implement real OAuth flow with backend
+    // For now, show user that connections need to be set up
+    alert('Connection setup not yet implemented. This will integrate with real OAuth providers once configured.');
     
-    setTimeout(() => {
-      setConnections(prev =>
-        prev.map(c =>
-          c.id === id
-            ? { ...c, status: 'connected' as const, lastSync: new Date(), itemsCount: 0 }
-            : c
-        )
-      );
-    }, 2000);
+    // Placeholder for future implementation:
+    // 1. Call backend API to initiate OAuth flow
+    // 2. Redirect to provider's authorization page
+    // 3. Handle OAuth callback
+    // 4. Update connection status in backend
   };
 
   const handleDisconnect = async (id: string) => {
+    // TODO: Implement real disconnection with backend
     setConnections(prev =>
-      prev.map(c => (c.id === id ? { ...c, status: 'disconnected' as const } : c))
+      prev.map(c => (c.id === id ? { ...c, status: 'disconnected' as const, lastSync: undefined, itemsCount: undefined } : c))
     );
   };
 
   const handleSync = async (id: string) => {
-    setConnections(prev =>
-      prev.map(c => (c.id === id ? { ...c, status: 'syncing' as const } : c))
-    );
-    
-    // Simulate sync
-    setTimeout(() => {
-      setConnections(prev =>
-        prev.map(c =>
-          c.id === id
-            ? {
-                ...c,
-                status: 'connected' as const,
-                lastSync: new Date(),
-                itemsCount: (c.itemsCount || 0) + Math.floor(Math.random() * 50),
-              }
-            : c
-        )
-      );
-    }, 3000);
+    // TODO: Implement real sync with backend
+    alert('Sync functionality will be available once connections are properly configured with OAuth.');
   };
 
   return (
