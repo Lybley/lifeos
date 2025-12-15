@@ -112,7 +112,14 @@ export async function queryRAG(
     }
 
     logger.info(`Found ${vectorResults.length} relevant chunks`);
-    logger.debug('First vector result metadata:', JSON.stringify(vectorResults[0]?.metadata || {}).substring(0, 200));
+    logger.debug(`First result check: id=${vectorResults[0]?.id}, score=${vectorResults[0]?.score}`);
+    logger.debug(`Metadata exists: ${!!vectorResults[0]?.metadata}`);
+    logger.debug(`Metadata type: ${typeof vectorResults[0]?.metadata}`);
+    logger.debug(`Metadata keys: ${Object.keys(vectorResults[0]?.metadata || {}).join(', ')}`);
+    logger.debug(`Has text field: ${!!vectorResults[0]?.metadata?.text}`);
+    if (vectorResults[0]?.metadata?.text) {
+      logger.debug(`Text preview: ${vectorResults[0].metadata.text.substring(0, 100)}`);
+    }
 
     // Step 2: Fetch graph context for the chunks
     const graphContextStart = Date.now();
