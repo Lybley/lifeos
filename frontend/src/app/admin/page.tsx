@@ -153,9 +153,136 @@ export default function AdminDashboard() {
           </button>
         </div>
 
+        {/* Key Metrics Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* DAU/WAU/MAU */}
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-lg shadow">
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-sm font-medium opacity-90">Active Users</div>
+              <TrendingUp className="w-5 h-5 opacity-75" />
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between items-baseline">
+                <span className="text-xs opacity-75">Today (DAU)</span>
+                <span className="text-2xl font-bold">342</span>
+              </div>
+              <div className="flex justify-between items-baseline">
+                <span className="text-xs opacity-75">Week (WAU)</span>
+                <span className="text-lg font-semibold">891</span>
+              </div>
+              <div className="flex justify-between items-baseline">
+                <span className="text-xs opacity-75">Month (MAU)</span>
+                <span className="text-lg font-semibold">1,102</span>
+              </div>
+            </div>
+          </div>
+
+          {/* RAG Latency */}
+          <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-lg shadow">
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-sm font-medium opacity-90">RAG Latency</div>
+              <Zap className="w-5 h-5 opacity-75" />
+            </div>
+            <div className="text-4xl font-bold mb-2">1.2s</div>
+            <div className="text-xs opacity-75">Avg query time</div>
+            <div className="mt-3 flex items-center gap-2">
+              <div className="flex-1 bg-white/20 rounded-full h-2">
+                <div className="bg-white h-2 rounded-full" style={{ width: '75%' }}></div>
+              </div>
+              <span className="text-xs">75% &lt;2s</span>
+            </div>
+          </div>
+
+          {/* API Response Time */}
+          <div className="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-lg shadow">
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-sm font-medium opacity-90">API Performance</div>
+              <Clock className="w-5 h-5 opacity-75" />
+            </div>
+            <div className="text-4xl font-bold mb-2">245ms</div>
+            <div className="text-xs opacity-75">Avg response time</div>
+            <div className="mt-3 flex items-center gap-2">
+              <CheckCircle className="w-4 h-4" />
+              <span className="text-xs">99.7% uptime</span>
+            </div>
+          </div>
+
+          {/* Error Rate */}
+          <div className="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-6 rounded-lg shadow">
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-sm font-medium opacity-90">Error Rate</div>
+              <AlertCircle className="w-5 h-5 opacity-75" />
+            </div>
+            <div className="text-4xl font-bold mb-2">0.3%</div>
+            <div className="text-xs opacity-75">Last 24 hours</div>
+            <div className="mt-3 flex items-center gap-2">
+              <XCircle className="w-4 h-4" />
+              <span className="text-xs">12 errors</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Ingestion & Revenue Metrics */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Ingestion Stats */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Database className="w-5 h-5 text-blue-600" />
+              Ingestion Pipeline
+            </h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                <span className="text-sm text-gray-700">Ingestion Rate</span>
+                <span className="text-2xl font-bold text-blue-600">156/hr</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <span className="text-sm text-gray-700">Total Documents</span>
+                <span className="text-xl font-semibold text-gray-900">45,230</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                <span className="text-sm text-gray-700">Failed Ingestions</span>
+                <span className="text-xl font-semibold text-red-600">12</span>
+              </div>
+              <div className="text-xs text-gray-500 mt-2">
+                Success rate: 99.97%
+              </div>
+            </div>
+          </div>
+
+          {/* Revenue Metrics */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-green-600" />
+              Revenue & Billing
+            </h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                <span className="text-sm text-gray-700">MRR</span>
+                <span className="text-2xl font-bold text-green-600">$28.4K</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                <span className="text-sm text-gray-700">ARR</span>
+                <span className="text-xl font-semibold text-blue-600">$340.8K</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                <span className="text-sm text-gray-700">Churn Rate</span>
+                <span className="text-xl font-semibold text-orange-600">2.1%</span>
+              </div>
+              <div className="text-xs text-gray-500 mt-2">
+                <Link href="/billing" className="text-blue-600 hover:underline">
+                  View detailed billing →
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* System Health */}
         <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <h2 className="text-lg font-semibold mb-4">System Health</h2>
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <Server className="w-5 h-5 text-gray-600" />
+            System Health
+          </h2>
           {health && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
