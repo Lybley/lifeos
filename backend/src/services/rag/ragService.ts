@@ -159,8 +159,10 @@ export async function queryRAG(
 
     // DEBUG: Log prompt details
     logger.info(`RAG Query - Sources: ${sources.length}, Prompt length: ${userPrompt.length} chars`);
-    logger.debug('First source content:', sources[0]?.content?.substring(0, 100));
-    logger.debug('User prompt preview:', userPrompt.substring(0, 500));
+    logger.debug('First source has content:', !!sources[0]?.content);
+    logger.debug('First source content length:', sources[0]?.content?.length || 0);
+    logger.debug('First source content preview:', sources[0]?.content?.substring(0, 150));
+    logger.debug('Full user prompt:\n' + userPrompt);
 
     // Step 5: Call LLM
     const llmStart = Date.now();
