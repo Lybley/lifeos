@@ -58,14 +58,7 @@ router.post(
       
       // Option 3: Store in database for manual export
       else {
-        // For now, just log the subscription
-        // In production, this would store in database
-        logger.info('Email subscription logged (DB not configured)', { 
-          email, 
-          source, 
-          metadata,
-          timestamp: new Date().toISOString()
-        });
+        await storeSubscriptionInDB(email, source, metadata);
       }
 
       return res.status(200).json({
