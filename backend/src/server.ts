@@ -89,21 +89,34 @@ const startServer = async () => {
   try {
     await initializeDatabases();
     
-    // Initialize action worker if Redis is available
+    // Check if Redis is available before initializing workers
+    let redisAvailable = false;
     try {
-      const { actionWorker: worker } = await import('./services/actionEngine/worker');
-      actionWorker = worker;
-      logger.info('Action Engine worker initialized');
-    } catch (workerError) {
-      logger.warn('Action worker not initialized (Redis may not be available)');
+      await queueConnection.ping();
+      redisAvailable = true;
+      logger.info('Redis connected successfully');
+    } catch (redisError) {
+      logger.warn('Redis not available, background jobs will be limited');
     }
     
-    // Initialize Google sync worker if Redis is available
-    try {
-      const { googleSyncWorker } = await import('./services/ingestion/googleDataWorker');
-      logger.info('Google Data Ingestion worker initialized');
-    } catch (workerError) {
-      logger.warn('Google sync worker not initialized (Redis may not be available)');
+    // Initialize action worker only if Redis is available
+    if (redisAvailable) {
+      try {
+        const { getActionWorker } = await import('./services/actionEngine/worker');
+        actionWorker = getActionWorker();
+        logger.info('Action Engine worker initialized');
+      } catch (workerError) {
+        logger.warn('Action worker not initialized:', workerError);
+      }
+      
+      // Initialize Google sync worker only if Redis is available
+      try {
+        const { getGoogleSyncWorker } = await import('./services/ingestion/googleDataWorker');
+        getGoogleSyncWorker();
+        logger.info('Google Data Ingestion worker initialized');
+      } catch (workerError) {
+        logger.warn('Google sync worker not initialized:', workerError);
+      }
     }
     
     // Initialize WebSocket server
