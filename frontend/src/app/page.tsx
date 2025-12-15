@@ -281,6 +281,114 @@ function DashboardContent() {
           </CardContent>
         </Card>
       </div>
+
+      {/* New Widgets Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Health Snapshot */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Heart className="w-5 h-5 text-red-500" />
+              Health Snapshot
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Sleep</span>
+                <span className="font-semibold">{healthData.sleep}h</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Steps</span>
+                <span className="font-semibold">{healthData.steps.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Mood</span>
+                <Badge variant="success">{healthData.mood}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Stress Level</span>
+                <Badge variant="default">{healthData.stress}</Badge>
+              </div>
+              <Link href="/settings?tab=health" className="block mt-4">
+                <Button variant="outline" size="sm" className="w-full">
+                  <Activity className="w-4 h-4 mr-2" />
+                  View Details
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Inbox Summary */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Mail className="w-5 h-5 text-blue-500" />
+              Inbox Summary
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <span className="text-sm text-gray-700 dark:text-gray-300">Unread</span>
+                <span className="text-2xl font-bold text-blue-600">{inboxSummary.unread}</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                <span className="text-sm text-gray-700 dark:text-gray-300">Important</span>
+                <span className="text-2xl font-bold text-orange-600">{inboxSummary.important}</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                <span className="text-sm text-gray-700 dark:text-gray-300">Needs Reply</span>
+                <span className="text-2xl font-bold text-purple-600">{inboxSummary.needsReply}</span>
+              </div>
+              <Link href="/connections" className="block mt-4">
+                <Button variant="outline" size="sm" className="w-full">
+                  Connect Gmail
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Memories */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-yellow-500" />
+              Recent Memories
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {recentMemories.map((memory) => (
+                <div
+                  key={memory.id}
+                  className="p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                >
+                  <h4 className="font-semibold text-sm mb-1">{memory.title}</h4>
+                  <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                    <Badge variant="default" size="sm">{memory.type}</Badge>
+                    <span>{memory.created}</span>
+                  </div>
+                  <div className="flex gap-1 mt-2">
+                    {memory.tags.map((tag: string) => (
+                      <span key={tag} className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              <Link href="/memory" className="block mt-4">
+                <Button variant="outline" size="sm" className="w-full">
+                  View All Memories
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
       
       {/* Onboarding Components */}
       <OnboardingChecklist />
