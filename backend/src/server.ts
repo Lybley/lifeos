@@ -121,7 +121,7 @@ process.on('SIGTERM', async () => {
     }
     await postgresClient.end();
     await neo4jDriver.close();
-    await queueConnection.close();
+    // await queueConnection.close(); // Commented out - Redis not available
   } catch (err) {
     logger.warn('Error during shutdown:', err);
   }
