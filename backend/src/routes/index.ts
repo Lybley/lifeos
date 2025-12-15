@@ -15,6 +15,7 @@ import vaultRouter from './vault';
 import adminRouter from './admin';
 import billingRouter from './billing';
 import marketingRouter from './marketing';
+import gdprRouter from './gdpr';
 
 const router = Router();
 
@@ -35,6 +36,7 @@ router.use('/v1/vault', vaultRouter);
 router.use('/v1/admin', adminRouter);
 router.use('/v1/billing', billingRouter);
 router.use('/v1/marketing', marketingRouter);
+router.use('/v1/gdpr', gdprRouter);
 
 // API info
 router.get('/', (req, res) => {
