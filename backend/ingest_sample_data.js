@@ -104,6 +104,7 @@ async function ingestDocuments() {
         values: embedding,
         metadata: {
           text: doc.text,
+          user_id: 'test-user-123', // Default test user
           ...doc.metadata,
           timestamp: new Date().toISOString()
         }
