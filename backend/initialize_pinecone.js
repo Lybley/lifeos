@@ -10,7 +10,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 
 // Load backend environment variables
-dotenv.config({ path: path.join(__dirname, 'backend', '.env') });
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const PINECONE_API_KEY = process.env.PINECONE_API_KEY;
 const INDEX_NAME = process.env.PINECONE_INDEX_NAME || 'lifeos-embeddings';
