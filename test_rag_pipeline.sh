@@ -6,7 +6,12 @@ echo "=========================================="
 echo ""
 
 BACKEND_URL="http://localhost:8000"
-API_KEY="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"
+# Load API key from environment or .env file
+API_KEY="${OPENAI_API_KEY:-}"
+if [ -z "$API_KEY" ]; then
+  echo "⚠️  OPENAI_API_KEY not set. Loading from backend/.env..."
+  API_KEY=$(grep OPENAI_API_KEY /app/backend/.env | cut -d '=' -f2)
+fi
 
 echo "📊 Step 1: Testing Embeddings Generation..."
 node -e "
