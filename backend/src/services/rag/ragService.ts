@@ -149,6 +149,11 @@ export async function queryRAG(
       { role: 'user', content: userPrompt },
     ];
 
+    // DEBUG: Log prompt details
+    logger.info(`RAG Query - Sources: ${sources.length}, Prompt length: ${userPrompt.length} chars`);
+    logger.debug('First source content:', sources[0]?.content?.substring(0, 100));
+    logger.debug('User prompt preview:', userPrompt.substring(0, 500));
+
     // Step 5: Call LLM
     const llmStart = Date.now();
     const llmClient = getDefaultLLMClient();
@@ -156,6 +161,7 @@ export async function queryRAG(
     timings.llm_time = Date.now() - llmStart;
 
     logger.info(`LLM response generated: ${llmResponse.usage.totalTokens} tokens`);
+    logger.debug('LLM response preview:', llmResponse.content.substring(0, 200));
 
     // Step 6: Validate LLM response with guardrails
     const guardrailSources: GuardrailSource[] = sources.map(s => ({
