@@ -142,6 +142,20 @@ export default function LandingPage() {
                   </Button>
                 </a>
               </div>
+              
+              {/* Mobile Auth Buttons */}
+              <div className="md:hidden flex items-center gap-2">
+                <a href="/api/auth/login">
+                  <button className="px-3 py-1.5 text-xs font-medium text-gray-700 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50">
+                    Sign In
+                  </button>
+                </a>
+                <a href="/api/auth/login?screen_hint=signup">
+                  <button className="px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:opacity-90">
+                    Start Free
+                  </button>
+                </a>
+              </div>
             </div>
           </div>
         </nav>
