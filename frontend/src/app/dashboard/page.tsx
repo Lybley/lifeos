@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist';
 import { TooltipManager } from '@/components/onboarding/TooltipManager';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 function DashboardContent() {
   const [stats, setStats] = useState({
@@ -399,8 +400,10 @@ function DashboardContent() {
 
 export default function DashboardPage() {
   return (
-    <DashboardLayout>
-      <DashboardContent />
-    </DashboardLayout>
+    <ProtectedRoute>
+      <DashboardLayout>
+        <DashboardContent />
+      </DashboardLayout>
+    </ProtectedRoute>
   );
 }
