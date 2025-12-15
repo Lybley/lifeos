@@ -5,6 +5,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { TrendingUp, Zap, Clock, AlertCircle, CheckCircle, XCircle, Database, DollarSign, Server } from 'lucide-react';
 
 interface HealthStatus {
   status: string;
