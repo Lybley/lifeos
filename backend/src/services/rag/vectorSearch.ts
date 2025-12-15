@@ -101,7 +101,7 @@ export async function searchVectors(
 
     logger.debug(`After score filtering: ${filteredMatches.length} matches`);
 
-    return filteredMatches.map(match => {
+    const mappedResults = filteredMatches.map(match => {
       const metadata = match.metadata || {};
       
       return {
@@ -110,6 +110,15 @@ export async function searchVectors(
         metadata: metadata as any,
       };
     });
+    
+    // DEBUG: Check what we're returning
+    if (mappedResults.length > 0) {
+      logger.debug(`Returning first result: id=${mappedResults[0].id}`);
+      logger.debug(`Returning metadata keys: ${Object.keys(mappedResults[0].metadata || {}).join(', ')}`);
+      logger.debug(`Has text in return: ${!!mappedResults[0].metadata?.text}`);
+    }
+    
+    return mappedResults;
   } catch (error) {
     logger.error('Vector search failed:', error);
     throw new Error(`Vector search failed: ${error}`);
