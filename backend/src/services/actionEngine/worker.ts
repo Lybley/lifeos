@@ -126,6 +126,9 @@ export function getActionWorker() {
     concurrency: 5, // Process up to 5 actions concurrently
   }
 );
+  }
+  return actionWorker;
+}
 
 // ============================================================================
 // ACTION MANAGEMENT
