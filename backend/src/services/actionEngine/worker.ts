@@ -199,7 +199,7 @@ export async function createAction(
     }
   } else {
     // If no approval needed, add to queue immediately
-    await actionQueue.add('process', { actionId }, { priority });
+    await getActionQueue().add('process', { actionId }, { priority });
     logger.info(`Action ${actionId} added to queue`);
   }
 
