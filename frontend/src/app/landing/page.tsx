@@ -680,19 +680,33 @@ export default function LandingPage() {
               <p className="text-gray-600 mb-6">
                 Join our waitlist and be the first to experience LifeOS
               </p>
-              <form onSubmit={handleEmailCapture} className="space-y-4">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
-                <Button type="submit" className="w-full" size="lg">
-                  Join Waitlist
-                </Button>
-              </form>
+              {submitSuccess ? (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                  <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-2" />
+                  <p className="text-green-800 font-semibold">Success!</p>
+                  <p className="text-green-600 text-sm">Check your email for next steps.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleEmailCapture} className="space-y-4">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                    disabled={submitting}
+                  />
+                  {submitError && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-600">
+                      {submitError}
+                    </div>
+                  )}
+                  <Button type="submit" className="w-full" size="lg" disabled={submitting}>
+                    {submitting ? 'Subscribing...' : 'Join Waitlist'}
+                  </Button>
+                </form>
+              )}
             </Card>
           </div>
         )}
