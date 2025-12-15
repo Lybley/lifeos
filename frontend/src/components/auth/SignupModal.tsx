@@ -28,23 +28,30 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSuc
     setError('');
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const endpoint = step === 'signup' ? '/api/auth/signup' : '/api/auth/login';
       
-      // Create user object
-      const user = {
-        name: formData.name || formData.email.split('@')[0],
-        email: formData.email,
-        authenticated: true,
-        timestamp: new Date().toISOString()
-      };
+      const response = await fetch(`${API_URL}${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
 
-      // Store in localStorage
-      localStorage.setItem('lifeos_user', JSON.stringify(user));
-      localStorage.setItem('lifeos_auth_token', 'demo_token_' + Date.now());
-      
-      // Set a cookie for server-side check (optional)
-      document.cookie = `lifeos_auth=true; path=/; max-age=86400; SameSite=Lax`;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Authentication failed');
+      }
+
+      // Store token and user data
+      localStorage.setItem('auth_token', data.token);
+      localStorage.setItem('lifeos_user', JSON.stringify(data.user));
 
       // Close modal
       onClose();
@@ -52,11 +59,11 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSuc
       // Small delay to ensure storage is set
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      // Redirect to dashboard without using Auth0
+      // Redirect to dashboard
       window.location.href = '/dashboard';
       
-    } catch (err) {
-      setError('Something went wrong. Please try again.');
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong. Please try again.');
       setLoading(false);
     }
   };
