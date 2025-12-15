@@ -202,31 +202,36 @@ async function processGoogleSyncJob(job: Job<GoogleSyncJob>): Promise<SyncResult
 // WORKER INITIALIZATION
 // ============================================================================
 
-export const googleSyncWorker = new Worker<GoogleSyncJob, SyncResult>(
-  'google-sync',
-  processGoogleSyncJob,
-  {
-    connection: queueConnection,
-    concurrency: 5, // Process up to 5 jobs concurrently
+export function getGoogleSyncWorker() {
+  if (!googleSyncWorker) {
+    googleSyncWorker = new Worker<GoogleSyncJob, SyncResult>(
+      'google-sync',
+      processGoogleSyncJob,
+      {
+        connection: queueConnection,
+        concurrency: 5, // Process up to 5 jobs concurrently
+      }
+    );
+
+    // Worker event handlers
+    googleSyncWorker.on('completed', (job, result) => {
+      logger.info('Google sync job completed', {
+        jobId: job.id,
+        service: job.data.service,
+        itemsIndexed: result.itemsIndexed,
+      });
+    });
+
+    googleSyncWorker.on('failed', (job, error) => {
+      logger.error('Google sync job failed', {
+        jobId: job?.id,
+        service: job?.data.service,
+        error: error.message,
+      });
+    });
   }
-);
-
-// Worker event handlers
-googleSyncWorker.on('completed', (job, result) => {
-  logger.info('Google sync job completed', {
-    jobId: job.id,
-    service: job.data.service,
-    itemsIndexed: result.itemsIndexed,
-  });
-});
-
-googleSyncWorker.on('failed', (job, error) => {
-  logger.error('Google sync job failed', {
-    jobId: job?.id,
-    service: job?.data.service,
-    error: error.message,
-  });
-});
+  return googleSyncWorker;
+}
 
 googleSyncWorker.on('error', (error) => {
   logger.error('Google sync worker error', { error: error.message });
