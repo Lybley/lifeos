@@ -89,11 +89,20 @@ export async function searchVectors(
       ? matches.filter(match => match.score && match.score >= options.minScore!)
       : matches;
 
-    return filteredMatches.map(match => ({
-      id: match.id,
-      score: match.score || 0,
-      metadata: (match.metadata as any) || {},
-    }));
+    return filteredMatches.map(match => {
+      // Ensure metadata is properly extracted
+      const metadata = match.metadata || {};
+      const text = typeof metadata.text === 'string' ? metadata.text : '';
+      
+      return {
+        id: match.id,
+        score: match.score || 0,
+        metadata: {
+          ...metadata,
+          text, // Ensure text field exists
+        } as any,
+      };
+    });
   } catch (error) {
     logger.error('Vector search failed:', error);
     throw new Error(`Vector search failed: ${error}`);
