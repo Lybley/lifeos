@@ -92,14 +92,17 @@ const startServer = async () => {
     // Skip Redis-dependent workers for now (Redis not available in this environment)
     logger.warn('Redis not available, background jobs will be limited');
     
+    logger.info('About to initialize WebSocket server...');
     // Initialize WebSocket server
     initializeWebSocket(httpServer);
+    logger.info('WebSocket initialized, about to start HTTP server...');
     
     httpServer.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`);
       logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
       logger.info(`WebSocket server enabled`);
     });
+    logger.info('HTTP server listen called...');
   } catch (error) {
     logger.error('Failed to start server:', error);
     process.exit(1);
