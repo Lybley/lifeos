@@ -120,6 +120,11 @@ export default function LandingPage() {
         <link rel="canonical" href="https://lifeos.app" />
       </Head>
 
+      <SignupModal 
+        isOpen={showSignupModal}
+        onClose={() => setShowSignupModal(false)}
+      />
+
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
         {/* Navigation */}
         <nav className="bg-white/80 backdrop-blur-md fixed w-full z-50 border-b border-gray-200">
