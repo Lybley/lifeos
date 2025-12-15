@@ -92,7 +92,11 @@ const startServer = async () => {
     // Check if Redis is available before initializing workers
     let redisAvailable = false;
     try {
-      await queueConnection.ping();
+      // Add a timeout to prevent hanging
+      await Promise.race([
+        queueConnection.ping(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Redis ping timeout')), 1000))
+      ]);
       redisAvailable = true;
       logger.info('Redis connected successfully');
     } catch (redisError) {
