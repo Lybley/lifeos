@@ -112,14 +112,6 @@ export async function queryRAG(
     }
 
     logger.info(`Found ${vectorResults.length} relevant chunks`);
-    logger.debug(`First result check: id=${vectorResults[0]?.id}, score=${vectorResults[0]?.score}`);
-    logger.debug(`Metadata exists: ${!!vectorResults[0]?.metadata}`);
-    logger.debug(`Metadata type: ${typeof vectorResults[0]?.metadata}`);
-    logger.debug(`Metadata keys: ${Object.keys(vectorResults[0]?.metadata || {}).join(', ')}`);
-    logger.debug(`Has text field: ${!!vectorResults[0]?.metadata?.text}`);
-    if (vectorResults[0]?.metadata?.text) {
-      logger.debug(`Text preview: ${vectorResults[0].metadata.text.substring(0, 100)}`);
-    }
 
     // Step 2: Fetch graph context for the chunks
     const graphContextStart = Date.now();
@@ -157,12 +149,7 @@ export async function queryRAG(
       { role: 'user', content: userPrompt },
     ];
 
-    // DEBUG: Log prompt details
     logger.info(`RAG Query - Sources: ${sources.length}, Prompt length: ${userPrompt.length} chars`);
-    logger.debug('First source has content:', !!sources[0]?.content);
-    logger.debug('First source content length:', sources[0]?.content?.length || 0);
-    logger.debug('First source content preview:', sources[0]?.content?.substring(0, 150));
-    logger.debug('Full user prompt:\n' + userPrompt);
 
     // Step 5: Call LLM
     const llmStart = Date.now();
@@ -171,7 +158,6 @@ export async function queryRAG(
     timings.llm_time = Date.now() - llmStart;
 
     logger.info(`LLM response generated: ${llmResponse.usage.totalTokens} tokens`);
-    logger.debug('FULL LLM RESPONSE:\n' + llmResponse.content);
 
     // Step 6: Validate LLM response with guardrails
     const guardrailSources: GuardrailSource[] = sources.map(s => ({
