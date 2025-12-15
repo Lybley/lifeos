@@ -159,7 +159,7 @@ async function storeSubscriptionInDB(
   metadata: any
 ): Promise<void> {
   // Store in PostgreSQL
-  const { pool } = await import('../config/database');
+  const { postgresClient } = await import('../config/postgres');
 
   const query = `
     INSERT INTO email_subscriptions (email, source, metadata, subscribed_at, status)
@@ -171,7 +171,7 @@ async function storeSubscriptionInDB(
       updated_at = NOW()
   `;
 
-  await pool.query(query, [email, source, JSON.stringify(metadata)]);
+  await postgresClient.query(query, [email, source, JSON.stringify(metadata)]);
   logger.info('Email stored in database', { email, source });
 }
 
