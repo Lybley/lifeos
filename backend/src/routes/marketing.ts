@@ -181,9 +181,9 @@ async function storeSubscriptionInDB(
  */
 router.get('/subscriptions/count', async (req: Request, res: Response) => {
   try {
-    const { pool } = await import('../config/database');
+    const { postgresClient } = await import('../config/postgres');
     
-    const result = await pool.query(
+    const result = await postgresClient.query(
       'SELECT COUNT(*) as total FROM email_subscriptions WHERE status = $1',
       ['pending']
     );
