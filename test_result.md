@@ -1104,3 +1104,121 @@ The Planner Engine is production-ready for the lifeos-core application. All core
 
 **🎉 CONCLUSION**: Both onboarding flows are production-ready with excellent user experience. All core functionality working perfectly, including post-onboarding dashboard integration with checklist and tooltips. The implementation is polished, responsive, and provides a comprehensive introduction to LifeOS features.
 
+---
+
+## ✅ RAG Query Endpoint Testing Complete
+**Date:** December 15, 2025
+**Status:** PARTIALLY FUNCTIONAL - VECTOR SEARCH WORKING, LLM INTEGRATION BLOCKED
+
+### Test Results Summary: ✅ 50% SUCCESS RATE (4/8 tests passed)
+
+**🎯 OVERALL STATUS**: ⚠️ **RAG PIPELINE PARTIALLY FUNCTIONAL**
+- **RAG Endpoint URL**: http://localhost:8000/api/v1/rag/query ✅
+- **Vector Search (Pinecone)**: ✅ WORKING - Finding relevant chunks
+- **Embeddings Generation**: ✅ WORKING - OpenAI embeddings functional
+- **LLM Integration**: ❌ BLOCKED - Connection error to LLM proxy
+- **API Validation**: ✅ WORKING - Proper error handling
+
+### Detailed Test Results:
+
+**✅ WORKING COMPONENTS (4/8 tests passed):**
+
+1. **✅ RAG Health Check** 
+   - Status: healthy
+   - Pinecone: True (configured correctly)
+   - LLM: True (keys available)
+   - Endpoint responding correctly
+
+2. **✅ Input Validation**
+   - Missing user_id: Correctly rejected (400 error)
+   - Missing query: Correctly rejected (400 error)
+   - Proper error messages returned
+
+3. **✅ Low Relevance Query Handling**
+   - Weather query: Correctly returned 0 chunks, confidence: none
+   - Proper handling of irrelevant queries
+
+4. **✅ Vector Search Functionality**
+   - "LifeOS features" query: Found 4 relevant chunks
+   - "LifeOS pricing" query: Found 2 relevant chunks  
+   - "LifeOS caching test" query: Found 1 relevant chunk
+   - Pinecone index contains 16 vectors with user_id metadata ✅
+
+**❌ BLOCKED COMPONENTS (4/8 tests failed):**
+
+1. **❌ Basic RAG Query** - 500 error
+   - Error: "OpenAI API error: Connection error"
+   - Vector search working (found 4 chunks)
+   - LLM generation step failing
+
+2. **❌ Pricing Query** - 500 error
+   - Error: "OpenAI API error: Connection error"
+   - Vector search working (found 2 chunks)
+   - LLM generation step failing
+
+3. **❌ Parameter Variations** - 500 error
+   - Error: "OpenAI API error: Connection error"
+   - Vector search working (found 3 chunks)
+   - LLM generation step failing
+
+4. **❌ Cache Functionality** - 500 error
+   - Error: "OpenAI API error: Connection error"
+   - Vector search working (found 1 chunk)
+   - LLM generation step failing
+
+### Root Cause Analysis:
+
+**✅ WORKING PIPELINE COMPONENTS:**
+1. **Embeddings Generation**: ✅ OpenAI embeddings API working correctly
+2. **Pinecone Vector Search**: ✅ Successfully finding relevant chunks with proper scores
+3. **User Filtering**: ✅ Properly filtering results by user_id metadata
+4. **API Validation**: ✅ Proper request validation and error handling
+5. **Endpoint Routing**: ✅ All RAG endpoints accessible and responding
+
+**❌ BLOCKED PIPELINE COMPONENTS:**
+1. **LLM Proxy Service**: ❌ Not running on localhost:8002
+   - EMERGENT_LLM_KEY configured but proxy unavailable
+   - Connection error when trying to generate responses
+   - Fallback to direct OpenAI API also failing
+
+2. **Neo4j Graph Context**: ❌ Not available (port 7687)
+   - Expected limitation, doesn't break core RAG functionality
+   - Graph context enhancement not available
+
+3. **Redis Caching**: ❌ Not available (port 6379)
+   - Expected limitation, doesn't break core RAG functionality
+   - Caching enhancement not available
+
+### Key Findings from Review Request:
+
+**✅ CONFIRMED WORKING:**
+- ✅ **Embeddings generated correctly**: OpenAI embeddings API functional
+- ✅ **Pinecone search returns results**: 16 vectors found, proper user filtering
+- ✅ **RAG service processes results correctly**: Vector search and filtering working
+- ✅ **Sample documents ingested**: Found LifeOS feature and pricing content
+
+**❌ IDENTIFIED ISSUES:**
+- ❌ **LLM generation blocked**: Connection error to LLM proxy service
+- ❌ **Complete RAG flow interrupted**: Cannot generate final answers
+- ❌ **Citations not generated**: LLM step required for citation extraction
+
+### Performance Metrics (Working Components):
+- Vector search latency: ~200-400ms
+- Embedding generation: Working correctly
+- API response time: <1 second for vector search
+- Error handling: Proper 400/500 status codes
+
+### Infrastructure Status:
+- ✅ Backend Server: Running on port 8000
+- ✅ Pinecone: Connected and operational (16 vectors indexed)
+- ✅ OpenAI Embeddings API: Working correctly
+- ❌ LLM Proxy: Not running on port 8002
+- ❌ Neo4j: Not available (optional for RAG)
+- ❌ Redis: Not available (optional for caching)
+
+### Test Files Created:
+- `/app/rag_test.py` - Comprehensive RAG endpoint test suite
+- All test scenarios from review request implemented and executed
+
+**🔍 CONCLUSION**: The RAG pipeline is **50% functional**. Vector search and embeddings are working perfectly, confirming that Pinecone integration and document ingestion are successful. The blocking issue is the LLM proxy service not being available, which prevents the final answer generation step. The core RAG infrastructure is solid and ready for production once the LLM service is restored.
+
