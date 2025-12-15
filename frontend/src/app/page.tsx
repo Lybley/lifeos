@@ -133,9 +133,14 @@ export default function LandingPage() {
                 <a href="#features" className="text-gray-600 hover:text-gray-900">Features</a>
                 <a href="#pricing" className="text-gray-600 hover:text-gray-900">Pricing</a>
                 <a href="#faq" className="text-gray-600 hover:text-gray-900">FAQ</a>
-                <Button onClick={() => router.push('/signup')} variant="primary">
-                  Get Started Free
-                </Button>
+                <a href="/api/auth/login" className="text-gray-600 hover:text-gray-900">
+                  Sign In
+                </a>
+                <a href="/api/auth/login?screen_hint=signup">
+                  <Button variant="primary">
+                    Get Started Free
+                  </Button>
+                </a>
               </div>
             </div>
           </div>
