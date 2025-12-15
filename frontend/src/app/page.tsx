@@ -62,34 +62,36 @@ function DashboardContent() {
         recentEvents: events?.events?.length || 0,
       });
 
-      // Combine recent activity
-      const activity: any[] = [];
-      
-      // Add recent actions
-      if (actions?.actions) {
-        actions.actions.slice(0, 3).forEach((action: any) => {
-          activity.push({
-            id: action.id,
-            type: 'action',
-            title: `${action.action_type}: ${action.status}`,
-            time: new Date(action.created_at).toLocaleString(),
-          });
-        });
-      }
+      // Mock recent activity
+      setRecentActivity([
+        { id: 1, type: 'memory', title: 'Added new memory: Project planning notes', timestamp: '2 hours ago' },
+        { id: 2, type: 'action', title: 'Completed task: Review Q4 metrics', timestamp: '5 hours ago' },
+        { id: 3, type: 'connection', title: 'Gmail synced successfully', timestamp: '1 day ago' },
+        { id: 4, type: 'memory', title: 'Created note: Meeting with Sarah', timestamp: '1 day ago' },
+      ]);
 
-      // Add recent events
-      if (events?.events) {
-        events.events.slice(0, 2).forEach((event: any) => {
-          activity.push({
-            id: event.id,
-            type: 'event',
-            title: `${event.event_type}`,
-            time: new Date(event.event_time).toLocaleString(),
-          });
-        });
-      }
+      // Mock recent memories
+      setRecentMemories([
+        { id: 1, title: 'Q4 Business Strategy', type: 'document', created: '2024-12-10', tags: ['business', 'strategy'] },
+        { id: 2, title: 'Team Meeting Notes', type: 'note', created: '2024-12-12', tags: ['meeting', 'team'] },
+        { id: 3, title: 'Product Roadmap 2025', type: 'document', created: '2024-12-14', tags: ['product', 'planning'] },
+      ]);
 
-      setRecentActivity(activity);
+      // Mock health data (in production, integrate with health APIs)
+      setHealthData({
+        sleep: 7.5,
+        steps: 8500,
+        mood: 'Good',
+        stress: 'Low',
+      });
+
+      // Mock inbox summary (in production, sync with Gmail)
+      setInboxSummary({
+        unread: 12,
+        important: 3,
+        needsReply: 5,
+      });
+
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
     } finally {
