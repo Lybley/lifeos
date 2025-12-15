@@ -36,18 +36,22 @@ export interface SyncResult {
 // QUEUES
 // ============================================================================
 
-// Queue for Google data sync jobs
-export const googleSyncQueue = new Queue<GoogleSyncJob>('google-sync', {
-  connection: queueConnection,
-  defaultJobOptions: {
-    attempts: 3,
-    backoff: {
-      type: 'exponential',
-      delay: 5000,
-    },
-    removeOnComplete: {
-      count: 100, // Keep last 100 completed jobs
-      age: 24 * 3600, // Keep for 24 hours
+let googleSyncQueue: Queue<GoogleSyncJob> | null = null;
+let googleSyncWorker: Worker | null = null;
+
+export function getGoogleSyncQueue() {
+  if (!googleSyncQueue) {
+    googleSyncQueue = new Queue<GoogleSyncJob>('google-sync', {
+      connection: queueConnection,
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 5000,
+        },
+        removeOnComplete: {
+          count: 100, // Keep last 100 completed jobs
+          age: 24 * 3600, // Keep for 24 hours
     },
     removeOnFail: {
       count: 500, // Keep last 500 failed jobs for debugging
