@@ -41,6 +41,9 @@ const HERO_VARIANTS = {
   },
 };
 
+import { LandingHeader } from '@/components/layout/LandingHeader';
+import { LandingFooter } from '@/components/layout/LandingFooter';
+
 export default function LandingPage() {
   const router = useRouter();
   const [variant, setVariant] = useState<keyof typeof HERO_VARIANTS>('variant_a');
