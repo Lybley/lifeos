@@ -229,7 +229,11 @@ export function getGoogleSyncWorker() {
         error: error.message,
       });
     });
-  }
+
+    // Worker error handler
+    googleSyncWorker.on('error', (error) => {
+      logger.error('Google sync worker error', { error: error.message });
+    });
   }
   return googleSyncWorker;
 }
