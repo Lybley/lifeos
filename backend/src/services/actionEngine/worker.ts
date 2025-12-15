@@ -535,8 +535,4 @@ export async function getActionAuditLogs(actionId: string): Promise<any[]> {
 // ============================================================================
 // Event listeners are now handled within getActionWorker() function
 
-actionWorker.on('error', (err) => {
-  logger.error('Worker error:', err);
-});
-
-logger.info('Action Engine worker initialized');
+logger.info('Action Engine module loaded (lazy initialization)');
