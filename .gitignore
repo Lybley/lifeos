@@ -81,3 +81,7 @@ temp/
 *.bak
 *.backup
 *~
+-e 
+# Environment files
+*.env
+*.env.*
