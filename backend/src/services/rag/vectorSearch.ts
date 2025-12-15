@@ -85,22 +85,29 @@ export async function searchVectors(
 
     // Filter by minimum score if specified
     const matches = results.matches || [];
+    
+    // DEBUG: Log what Pinecone returns
+    logger.debug(`Pinecone returned ${matches.length} matches`);
+    if (matches.length > 0) {
+      const firstMatch = matches[0];
+      logger.debug(`First match: id=${firstMatch.id}, score=${firstMatch.score}`);
+      logger.debug(`First match metadata type: ${typeof firstMatch.metadata}`);
+      logger.debug(`First match metadata: ${JSON.stringify(firstMatch.metadata).substring(0, 200)}`);
+    }
+    
     const filteredMatches = options.minScore
       ? matches.filter(match => match.score && match.score >= options.minScore!)
       : matches;
 
+    logger.debug(`After score filtering: ${filteredMatches.length} matches`);
+
     return filteredMatches.map(match => {
-      // Ensure metadata is properly extracted
       const metadata = match.metadata || {};
-      const text = typeof metadata.text === 'string' ? metadata.text : '';
       
       return {
         id: match.id,
         score: match.score || 0,
-        metadata: {
-          ...metadata,
-          text, // Ensure text field exists
-        } as any,
+        metadata: metadata as any,
       };
     });
   } catch (error) {
