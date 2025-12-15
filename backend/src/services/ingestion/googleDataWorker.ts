@@ -52,12 +52,15 @@ export function getGoogleSyncQueue() {
         removeOnComplete: {
           count: 100, // Keep last 100 completed jobs
           age: 24 * 3600, // Keep for 24 hours
-    },
-    removeOnFail: {
-      count: 500, // Keep last 500 failed jobs for debugging
-    },
-  },
-});
+        },
+        removeOnFail: {
+          count: 500, // Keep last 500 failed jobs for debugging
+        },
+      },
+    });
+  }
+  return googleSyncQueue;
+}
 
 // ============================================================================
 // WORKER IMPLEMENTATION
