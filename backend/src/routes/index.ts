@@ -16,10 +16,12 @@ import adminRouter from './admin';
 import billingRouter from './billing';
 import marketingRouter from './marketing';
 import gdprRouter from './gdpr';
+import authRouter from './auth';
 
 const router = Router();
 
 // API routes
+router.use('/auth', authRouter);
 router.use('/nodes', nodesRouter);
 router.use('/vectors', vectorsRouter);
 router.use('/jobs', jobsRouter);
