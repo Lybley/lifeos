@@ -1,0 +1,5 @@
+# Zumffer LifeOS - SEO Configuration
+User-agent: *
+Allow: /
+
+Sitemap: https://zumffer.com/sitemap.xml
