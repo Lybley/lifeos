@@ -132,11 +132,18 @@ export default function LandingPage() {
         <nav className="bg-white/80 backdrop-blur-md fixed w-full z-50 border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Brain className="w-8 h-8 text-blue-600" />
-                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  LifeOS
-                </span>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
+                  <span className="text-white font-bold text-xl">Z</span>
+                </div>
+                <div className="flex flex-col -space-y-1">
+                  <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    Zumffer
+                  </span>
+                  <span className="text-xs text-gray-500 font-medium tracking-wide">
+                    LifeOS
+                  </span>
+                </div>
               </div>
               <div className="hidden md:flex items-center space-x-8">
                 <a href="#features" className="text-gray-600 hover:text-gray-900">Features</a>
