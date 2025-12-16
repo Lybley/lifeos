@@ -110,14 +110,16 @@ export default function LandingPage() {
   return (
     <>
       <Head>
-        <title>LifeOS - Your AI-Powered Second Brain | Personal Memory & Productivity System</title>
-        <meta name="description" content="Transform your scattered information into an intelligent system. AI agents that remember, organize, and act on your behalf. Never forget important details again." />
-        <meta name="keywords" content="AI personal assistant, second brain, memory system, productivity tool, AI agents, task automation" />
-        <meta property="og:title" content="LifeOS - Your AI-Powered Second Brain" />
-        <meta property="og:description" content="Remember everything. Automate anything. Your personal operating system for life." />
+        <title>Zumffer LifeOS - Your AI-Powered Second Brain | Personal Memory & Productivity System</title>
+        <meta name="description" content="Zumffer LifeOS transforms your scattered information into an intelligent system. AI agents that remember, organize, and act on your behalf. Never forget important details again." />
+        <meta name="keywords" content="Zumffer, LifeOS, AI personal assistant, second brain, memory graph, productivity tool, AI agents, task automation, knowledge management, personal AI" />
+        <meta property="og:title" content="Zumffer LifeOS - Your AI-Powered Second Brain" />
+        <meta property="og:description" content="Remember everything. Automate anything. Zumffer - Your personal operating system for life." />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
-        <link rel="canonical" href="https://lifeos.app" />
+        <meta name="twitter:title" content="Zumffer LifeOS - AI-Powered Personal Operating System" />
+        <meta name="twitter:description" content="Your intelligent second brain that remembers everything and automates your life." />
+        <link rel="canonical" href="https://zumffer.com" />
       </Head>
 
       <SignupModal 
