@@ -1,5 +1,5 @@
 /**
- * LifeOS Landing Page
+ * Zumffer LifeOS Landing Page
  * High-converting marketing page with A/B test variants
  */
 'use client';
@@ -33,11 +33,11 @@ const HERO_VARIANTS = {
   },
   variant_b: {
     headline: "Stop Forgetting. Start Achieving.",
-    subheadline: "LifeOS turns your scattered notes, emails, and tasks into an intelligent system that works for you 24/7.",
+    subheadline: "Zumffer LifeOS turns your scattered notes, emails, and tasks into an intelligent system that works for you 24/7.",
   },
   variant_c: {
     headline: "The Last Productivity Tool You'll Ever Need",
-    subheadline: "AI agents that remember, organize, and act on your behalf. Your personal operating system for life.",
+    subheadline: "AI agents that remember, organize, and act on your behalf. Zumffer - Your personal operating system for life.",
   },
 };
 

@@ -10,13 +10,18 @@ export const LandingHeader: React.FC = () => {
       <nav className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary-600 to-accent-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">L</span>
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-accent-600 rounded-lg flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-xl">Z</span>
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
-              LifeOS
-            </span>
+            <div className="flex flex-col -space-y-1">
+              <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
+                Zumffer
+              </span>
+              <span className="text-xs text-gray-500 font-medium tracking-wide">
+                LifeOS
+              </span>
+            </div>
           </Link>
 
           {/* Navigation */}
