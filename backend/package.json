@@ -1,7 +1,7 @@
 {
-  "name": "lifeos-backend",
+  "name": "zumffer-lifeos-backend",
   "version": "1.0.0",
-  "description": "LifeOS Backend API",
+  "description": "Zumffer LifeOS Backend API",
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",

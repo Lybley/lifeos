@@ -33,11 +33,11 @@ const HERO_VARIANTS = {
   },
   variant_b: {
     headline: "Stop Forgetting. Start Achieving.",
-    subheadline: "LifeOS turns your scattered notes, emails, and tasks into an intelligent system that works for you 24/7.",
+    subheadline: "Zumffer LifeOS turns your scattered notes, emails, and tasks into an intelligent system that works for you 24/7.",
   },
   variant_c: {
     headline: "The Last Productivity Tool You'll Ever Need",
-    subheadline: "AI agents that remember, organize, and act on your behalf. Your personal operating system for life.",
+    subheadline: "AI agents that remember, organize, and act on your behalf. Your personal operating system for life by Zumffer.",
   },
 };
 
@@ -109,7 +109,7 @@ export default function LandingPage() {
         <meta name="description" content="Transform your scattered information into an intelligent system. AI agents that remember, organize, and act on your behalf. Never forget important details again." />
         <meta name="keywords" content="AI personal assistant, second brain, memory system, productivity tool, AI agents, task automation" />
         <meta property="og:title" content="LifeOS - Your AI-Powered Second Brain" />
-        <meta property="og:description" content="Remember everything. Automate anything. Your personal operating system for life." />
+        <meta property="og:description" content="Remember everything. Automate anything. Your personal operating system for life by Zumffer." />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
         <link rel="canonical" href="https://lifeos.app" />
