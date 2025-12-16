@@ -79,7 +79,7 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSuc
             </h2>
             <p className="text-sm text-gray-600 mt-1">
               {step === 'signup' 
-                ? 'Start your journey with LifeOS' 
+                ? 'Start your journey with Zumffer LifeOS' 
                 : 'Sign in to continue'}
             </p>
           </div>

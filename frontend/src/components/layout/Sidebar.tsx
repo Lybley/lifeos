@@ -32,10 +32,18 @@ export const Sidebar: React.FC = () => {
     <aside className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
       {/* Logo */}
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
-          LifeOS
-        </h1>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Personal Memory Graph</p>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-accent-600 rounded-lg flex items-center justify-center shadow-lg">
+            <span className="text-white font-bold text-xl">Z</span>
+          </div>
+          <div className="flex flex-col -space-y-1">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
+              Zumffer
+            </h1>
+            <span className="text-xs text-gray-500 dark:text-gray-400 font-medium tracking-wide">LifeOS</span>
+          </div>
+        </div>
+        <p className="text-xs text-gray-500 dark:text-gray-400">Personal Memory Graph</p>
       </div>
 
       {/* Navigation */}
